@@ -24,3 +24,35 @@ body {
   color: var(--foreground);
   font-family: Arial, Helvetica, sans-serif;
 }
+
+.hairline-h::after {
+  content: "";
+  display: block;
+  width: 1000px;
+  height: 0.5px;
+  background: rgba(255, 255, 255, 0.1);
+}
+
+
+.hairline-v::after {
+  content: "";
+  display: block;
+  width: 0.5px;
+  height: 1000px;
+  background: rgba(255, 255, 255, 0.1);
+}
+
+.container-item {
+  border: 1px solid black;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: 300px;
+      height: 300px;
+      position: relative;
+      transition: all 0.2s ease;
+}
+.container-item:hover {
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); /* Shadow on hover */
+  transform: translateY(-2px); /* Slight lift effect */
+}
