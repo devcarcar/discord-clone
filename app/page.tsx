@@ -1,27 +1,24 @@
-"use client"
-import { redirect } from "next/navigation";
-
+'use client';
+import { redirect } from 'next/navigation';
 
 export default function DefaultStart() {
-return (
-  <div>
-
-<button onClick={() => {
-  const condition = true
-  if (condition) {
-   return redirect("/auth")
-  } else {
-   return redirect("/home")
-  }
-}}>
-  Enter chat
-</button>
-
-  </div>
-)
-
+  return (
+    <div>
+      <button
+        onClick={() => {
+          const condition = true;
+          if (condition) {
+            return redirect('/auth');
+          } else {
+            return redirect('/home');
+          }
+        }}
+      >
+        Enter chat
+      </button>
+    </div>
+  );
 }
-
 
 /*
 import { useState, useEffect } from 'react';

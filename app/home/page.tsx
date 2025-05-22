@@ -1,10 +1,9 @@
-import Navbar from "@/components/Navbar";
-import GroupsButton from "@/components/buttons/groups";
+import Navbar from '@/components/Navbar';
 
 export default function Home() {
-return (
+  return (
     <div>
- <Navbar page={0}/>
+      <Navbar page={0} />
     </div>
-)
+  );
 }

@@ -1,5 +1,5 @@
-import { Schema, model, models } from "mongoose";
-import { v4 as uuidv4 } from "uuid";
+import { Schema, model, models } from 'mongoose';
+import { v4 as uuidv4 } from 'uuid';
 
 const user = new Schema({
   userId: {
@@ -10,7 +10,9 @@ const user = new Schema({
   },
   email: { type: String, required: true },
   password: { type: String, required: true },
-  username: { type: String, required: true },
+  // username: { type: String, required: true },
 });
 
-export const User = models?.User || model("User", user);
+const User = models?.User || model('User', user);
+
+export default User;

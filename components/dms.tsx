@@ -1,53 +1,66 @@
 'use client';
 import { redirect } from 'next/navigation';
 
-interface Group {
+interface Dm {
   id: string;
   name: string;
-  description: string;
   icon: string;
-  members: number;
-  activity: number;
+  status: Status;
+  active: boolean;
 }
 
-const arr: Group[] = [
+enum Status {
+  ONLINE = 'ONLINE',
+  DND = 'DND',
+  OFFLINE = 'OFFLINE',
+}
+const arr: Dm[] = [
   {
     id: '3423-124912481904891308',
-    name: 'Group 1',
-    description: 'Group 1 desc',
+    name: 'user1',
     icon: 'https://h7.alamy.com/comp/W3E09A/example-ribbon-example-isolated-sign-example-banner-W3E09A.jpg',
-    members: 12,
-    activity: 2,
+    status: Status.ONLINE,
+    active: true,
   },
   {
     id: '3423-124912481904891309',
-    name: 'Group 2',
-    description: 'Group 2 desc',
+    name: 'user2',
     icon: 'https://h7.alamy.com/comp/W3E09A/example-ribbon-example-isolated-sign-example-banner-W3E09A.jpg',
-    members: 12,
-    activity: 2,
+    status: Status.DND,
+    active: true,
   },
   {
     id: '3423-124912481904891310',
-    name: 'Group 3',
-    description: 'Group 3 desc',
+    name: 'user3',
     icon: 'https://h7.alamy.com/comp/W3E09A/example-ribbon-example-isolated-sign-example-banner-W3E09A.jpg',
-    members: 12,
-    activity: 2,
+    status: Status.ONLINE,
+    active: false,
   },
   {
     id: '3423-124912481904891311',
-    name: 'Group 4',
-    description: 'Group 4 desc',
+    name: 'user4',
     icon: 'https://h7.alamy.com/comp/W3E09A/example-ribbon-example-isolated-sign-example-banner-W3E09A.jpg',
-    members: 13,
-    activity: 2,
+    status: Status.OFFLINE,
+    active: false,
+  },
+  {
+    id: '3423-124912481904891312',
+    name: 'user5',
+    icon: 'https://h7.alamy.com/comp/W3E09A/example-ribbon-example-isolated-sign-example-banner-W3E09A.jpg',
+    status: Status.DND,
+    active: false,
   },
 ];
 
-export default function GroupsList() {
+enum StatusIcon {
+  ONLINE = '🟢',
+  DND = '🔴',
+  OFFLINE = '⚪',
+}
+
+export default function DmsList() {
   return (
-    <div className='grid grid-cols-3 gap-[100px] p-[50px]'>
+    <div className='grid grid-cols-5 gap-[100px] p-[50px]'>
       {arr.map((i) => {
         return (
           <div className='group relative' key={i.id}>
@@ -66,12 +79,10 @@ export default function GroupsList() {
                 <h2 className='text-xl font-semibold text-gray-800 dark:text-white mb-1 truncate'>
                   {i.name}
                 </h2>
-                <p className='text-sm text-gray-600 dark:text-gray-300 mb-3 line-clamp-2'>
-                  {i.description}
-                </p>
+
                 <div className='flex justify-between text-xs text-gray-500 dark:text-gray-400 mt-4'>
-                  <span>👥 {i.members} members</span>
-                  <span>🔥 {i.activity} active</span>
+                  <span>{StatusIcon[i.status] + ' ' + i.status}</span>
+                  {i.active && <span>🔥 active</span>}
                 </div>
               </div>
             </button>

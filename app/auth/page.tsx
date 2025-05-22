@@ -1,30 +1,79 @@
-"use client"
-import { redirect } from "next/navigation";
-import { useState } from "react";
+'use client';
 
-const list = [
-  {login: "aa", password: "bb"},
-  {login: "1234", password: "1234"}
-]
+import User from '@/schemas/user';
+import axios from 'axios';
+import { redirect, useRouter } from 'next/navigation';
+import { useState } from 'react';
+import jwt from 'jsonwebtoken';
 
 export default function Auth() {
-        const [login, setLogin] = useState("");
-        const [password, setPassword] = useState("")
-        function validate() {
-if (list.find(c => c.login === login && c.password === password)) {
-  return redirect("/home")
-} else {
-  alert("Please check your password or login info")
+  const router = useRouter();
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+  const [error, setError] = useState(false);
+  async function validate() {
+    try {
+      const res = await axios.post('/api/auth/email', {
+        email,
+        password,
+      });
+      router.push('/home');
+    } catch (e) {
+      setError(true);
+    }
+  }
+  return (
+    <div className='flex flex-col items-center absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-[300px] min-h-[400px] bg-white p-8 rounded-lg shadow-md'>
+      <h1 className='text-xl text-black mb-8'>Sign in to Chat</h1>
+
+      <div className='w-full space-y-4 mb-6'>
+        <div>
+          <h1 className='text-black'>Email ID</h1>
+          <input
+            onChange={(e) => setEmail(e.target.value)}
+            className='w-full text-black border-2 border-gray-300 p-2 rounded-lg focus:outline-none focus:border-blue-500'
+            type='text'
+            placeholder='Enter your Email ID'
+            value={email}
+          />
+        </div>
+
+        <div>
+          <h1 className='text-black'>Password</h1>
+          <input
+            onChange={(e) => setPassword(e.target.value)}
+            className='w-full text-black border-2 border-gray-300 p-2 rounded-lg focus:outline-none focus:border-blue-500'
+            type='password'
+            placeholder='Enter your Password'
+            value={password}
+          />
+        </div>
+
+        {error && (
+          <p className='text-red-500 text-sm mt-2'>Error! Wrong credentials</p>
+        )}
+      </div>
+
+      <button
+        disabled={!email || !password}
+        onClick={validate}
+        className={`w-full py-2 rounded-lg shadow-md transition-colors ${
+          !email || !password
+            ? 'bg-gray-400 cursor-not-allowed'
+            : 'bg-blue-500 hover:bg-blue-600'
+        }`}
+      >
+        Sign in
+      </button>
+
+      <hr className='w-full border-gray-300 my-6' />
+
+      <p className='text-black text-center'>
+        Don't have an account?{' '}
+        <a className='text-blue-600 hover:underline' href='/auth/sign-up'>
+          Sign up
+        </a>
+      </p>
+    </div>
+  );
 }
-        }
-       return (
-  <div className="flex justify-center items-center absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-[300px] h-[400px] bg-white p-8 rounded-lg shadow-md">
-       <input onChange={(e) => setLogin(e.target.value)} className="text-black absolute bottom-60/100 border-solid p-1.5 rounded border-2 placeholder-black border-gray-500"  type="text" name="UserLogin" id="UserLogin" placeholder="Login ID"/>
-       <input onChange={(e) => setPassword(e.target.value)} className="text-black absolute bottom-45/100 border-solid p-1.5 rounded border-2 placeholder-black border-gray-500"  type="password" name="UserPassw" id="UserPassw" placeholder="Password"/>
-        <button disabled={login == "" || password == "" ? true : false} type="submit" onClick={validate} className="absolute bottom-1/3 bg-black shadow-md rounded-lg w-[200px]">Sign in</button>
-    <hr className="bg-gray-500 h-[2px] w-[200px] absolute bottom-1/4"/>
-<h6 className="absolute bottom-1/6 text-black">Don't have an account? <a className="text-blue-600" href="/auth/sign-up">Sign up</a></h6>
-         </div>
-       )
-}
- 
