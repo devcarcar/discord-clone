@@ -19,7 +19,7 @@ export default function GroupPage() {
 
   return (
     <div className='flex'>
-      <div className='w-[250px]'>
+      <div>
         <Navbar page={1} />
       </div>
       <div className='w-full'>
