@@ -58,7 +58,7 @@ enum StatusIcon {
   OFFLINE = '⚪',
 }
 
-export default function DmsList() {
+export default function DmsList({ arr }: { arr: Dm[] }) {
   return (
     <div className='grid grid-cols-5 gap-[100px] p-[50px]'>
       {arr.map((i) => {

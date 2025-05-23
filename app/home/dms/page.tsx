@@ -2,19 +2,29 @@
 import Navbar from '@/components/Navbar';
 import DmsList from '@/components/dms';
 import axios from 'axios';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 
 export default function DmsPage() {
-  let userId;
-  async function validate() {
-    const res = await axios.get('/api/users/getDms');
-    userId = res.data.data.userId;
-  }
-  validate();
+  const [dms, setDms] = useState([]);
+
+  useEffect(() => {
+    async function fetchDms() {
+      try {
+        const res = await axios.get('/api/users/getUser');
+        setDms(res.data.data.dms);
+      } catch (err: any) {}
+    }
+    fetchDms();
+  }, []);
+
   return (
-    <div>
-      <Navbar page={2} />
-      <DmsList />
+    <div className='flex'>
+      <div className='w-[250px]'>
+        <Navbar page={2} />
+      </div>
+      <div className='w-full'>
+        <DmsList arr={dms} />
+      </div>
     </div>
   );
 }

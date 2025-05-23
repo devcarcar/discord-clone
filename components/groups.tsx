@@ -45,10 +45,10 @@ const arr: Group[] = [
   },
 ];
 
-export default function GroupsList() {
+export default function GroupsList({ groups }: { groups: Group[] }) {
   return (
     <div className='grid grid-cols-3 gap-[100px] p-[50px]'>
-      {arr.map((i) => {
+      {groups.map((i) => {
         return (
           <div className='group relative' key={i.id}>
             <button
