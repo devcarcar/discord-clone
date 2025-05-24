@@ -1,11 +1,13 @@
 'use client';
 import Navbar from '@/components/Navbar';
 import GroupsList from '@/components/groups';
+import Header from '@/components/header';
 import axios from 'axios';
 import { useEffect, useState } from 'react';
 
 export default function GroupPage() {
   const [groups, setGroups] = useState([]);
+  const [isSearching, setIsSearching] = useState(false);
 
   useEffect(() => {
     async function fetchGroups() {
@@ -22,7 +24,8 @@ export default function GroupPage() {
       <div>
         <Navbar page={1} />
       </div>
-      <div className='w-full'>
+      <div className='w-full bg-gray-900'>
+        <Header setIsSearching={setIsSearching} title='Groups' />
         <GroupsList groups={groups} />
       </div>
     </div>

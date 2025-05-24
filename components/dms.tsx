@@ -60,7 +60,7 @@ enum StatusIcon {
 
 export default function DmsList({ arr }: { arr: Dm[] }) {
   return (
-    <div className='grid grid-cols-5 gap-[100px] p-[50px]'>
+    <div className='grid grid-cols-5 gap-[75px] p-[75px]'>
       {arr.map((i) => {
         return (
           <div className='group relative' key={i.id}>
