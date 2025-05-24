@@ -41,25 +41,25 @@ export default function SearchPage({
         </div>
 
         {searchQuery && (
-          <div className='mt-4 p-2 text-gray-400 text-sm'>
-            <div className='flex justify-center items-center'>
-              {' '}
-              Search results for "{searchQuery}"{' '}
-            </div>
-            <div className='space-y-2'>
+          <div className='mt-4'>
+            <p className='px-2 pb-2 text-gray-400 text-sm'>
+              Results for <span className='text-white'>"{searchQuery}"</span>
+            </p>
+            <div className='space-y-1'>
               {listOfSearches
                 .filter((i) =>
                   i.toLowerCase().includes(searchQuery.toLowerCase())
                 )
                 .map((i) => (
-                  <div
-                    className=' font-semibold rounded-lg border h-[50px] border-gray-400 flex items-center'
+                  <button
                     key={i}
+                    className='w-full text-left p-3 rounded-md hover:bg-gray-700/50 transition-colors flex items-center gap-2'
                   >
-                    <button>{i}</button>
-                  </div>
+                    <Search className='w-4 h-4 text-gray-400 flex-shrink-0' />
+                    <span className='truncate'>{i}</span>
+                  </button>
                 ))}
-            </div>{' '}
+            </div>
           </div>
         )}
       </div>
