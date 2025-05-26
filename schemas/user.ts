@@ -1,6 +1,52 @@
 import { Schema, model, models } from 'mongoose';
 import { v4 as uuidv4 } from 'uuid';
 
+function getRandomUserString() {
+  let str = 'user_';
+  let arr = [
+    'a',
+    'b',
+    'c',
+    'd',
+    'e',
+    'f',
+    'g',
+    'h',
+    'i',
+    'j',
+    'k',
+    'l',
+    'm',
+    'n',
+    'o',
+    'p',
+    'q',
+    'r',
+    's',
+    't',
+    'u',
+    'v',
+    'w',
+    'x',
+    'y',
+    'z',
+    '0',
+    '1',
+    '2',
+    '3',
+    '4',
+    '5',
+    '6',
+    '7',
+    '8',
+    '9',
+  ];
+  for (let i = 0; i < 15; i++) {
+    str += arr[Math.floor(Math.random() * 36)];
+  }
+  return str;
+}
+
 interface Group {
   id: string;
   name: string;
@@ -103,7 +149,11 @@ const user = new Schema({
       },
     ],
   },
-  // username: { type: String, required: true },
+  username: {
+    type: String,
+    required: true,
+    default: () => getRandomUserString(),
+  },
 });
 
 const User = models?.User || model('User', user);

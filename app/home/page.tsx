@@ -4,7 +4,6 @@ import Header from '@/components/header';
 import SearchPage from '@/components/search';
 import axios from 'axios';
 import { Bell, Search, Sparkles, X } from 'lucide-react';
-import Link from 'next/link';
 import { useEffect, useRef, useState } from 'react';
 
 export default function Home() {

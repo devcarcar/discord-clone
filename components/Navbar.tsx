@@ -1,9 +1,26 @@
 'use client';
+import axios from 'axios';
 import { House, Settings, User, Users } from 'lucide-react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
+import { useEffect, useState } from 'react';
 
 const Navbar = ({ page }: { page: number }) => {
+  const [user, setUser] = useState<any>();
+  const [isLoading, setisLoading] = useState(true);
+  useEffect(() => {
+    async function getUser() {
+      try {
+        const res = await axios.get('/api/users/getUser');
+        setUser(res.data.data);
+      } catch (e: any) {
+        throw new Error('Some fetching problems', e);
+      } finally {
+        setisLoading(false);
+      }
+    }
+    getUser();
+  }, []);
   const router = useRouter();
   return (
     <nav className='sticky top-0 h-screen w-[220px] bg-gray-800 border-r border-gray-700'>
@@ -53,7 +70,9 @@ const Navbar = ({ page }: { page: number }) => {
               <span className='absolute bottom-0 right-0 w-2.5 h-2.5 bg-green-500 rounded-full border border-gray-800'></span>
             </div>
             <div className='min-w-0 flex-1'>
-              <p className='text-sm font-medium truncate'>User</p>
+              <p className='text-sm font-medium truncate'>
+                {user?.username || 'Loading...'}
+              </p>
               <p className='text-xs text-gray-400 truncate'>Online</p>
             </div>
             <button
