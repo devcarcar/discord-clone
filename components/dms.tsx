@@ -65,7 +65,7 @@ export default function DmsList({ arr }: { arr: Dm[] }) {
         return (
           <div className='group relative' key={i.id}>
             <button
-              onClick={() => redirect(`/home/groups/${i.id}`)}
+              onClick={() => redirect(`/home/dms/${i.id}`)}
               className='border-4 border-white w-full h-full rounded-lg shadow-md hover:shadow-lg transition-shadow duration-300 overflow-hidden text-left hover:-translate-y-2 transform'
             >
               <div className='flex justify-center p-4'>

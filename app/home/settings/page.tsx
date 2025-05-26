@@ -15,6 +15,12 @@ import { useEffect, useState } from 'react';
 export default function SettingsPage() {
   const [user, setUser] = useState<any>({});
   const [isLoading, setisLoading] = useState(true);
+  const [new_un, setNew_un] = useState<string>(user.name);
+  const [buttonClicked, setbuttonClicked] = useState(false);
+  const [notif, setNotif] = useState(false);
+  function handleClick() {
+    setbuttonClicked(true);
+  }
   useEffect(() => {
     async function fetchUser() {
       try {
@@ -28,6 +34,25 @@ export default function SettingsPage() {
     }
     fetchUser();
   }, []);
+
+  useEffect(() => {
+    async function changeUsername() {
+      try {
+        const res = await axios.patch('/api/users/changeUser', {
+          userId: user.userId,
+          new_un: new_un,
+        });
+        console.log(res);
+      } catch (e: any) {
+        throw new Error('Some fetching problems', e);
+      } finally {
+        setbuttonClicked(false);
+        setNotif(true);
+      }
+    }
+    if (buttonClicked) changeUsername();
+  }, [buttonClicked]);
+
   if (isLoading)
     return <div className='h-screen w-screen bg-gray-900'>Loading...</div>;
   return (
@@ -101,9 +126,13 @@ export default function SettingsPage() {
                       className='flex-1 bg-gray-900 border border-gray-700 rounded-lg px-4 py-2 text-white 
                                 focus:ring-2 focus:ring-blue-500 focus:border-transparent'
                       placeholder='Enter new username'
+                      onChange={(e) => setNew_un(e.target.value)}
                       defaultValue={user.username}
                     />
-                    <button className='px-4 py-2 bg-blue-600 rounded-lg hover:bg-blue-500 transition-colors'>
+                    <button
+                      onClick={handleClick}
+                      className='px-4 py-2 bg-blue-600 rounded-lg hover:bg-blue-500 transition-colors'
+                    >
                       Save
                     </button>
                   </div>
