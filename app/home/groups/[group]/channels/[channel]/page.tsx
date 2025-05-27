@@ -110,6 +110,7 @@ export default function ExactGroup() {
   );
   const router = useRouter();
   if (isLoading) return <div>Loading</div>;
+
   return (
     <div className='flex'>
       <div>
@@ -162,8 +163,21 @@ export default function ExactGroup() {
               </button>
             ))}
           </div>
-          <div className='flex items-center justify-center flex-grow'>
-            Select a channel
+          <div className='flex flex-grow'>
+            {/* left hand side for messages & message bar */}
+            <div>
+              <div className='h-[600px]'>
+                <h1>Messages</h1>
+              </div>
+              <div className='flex justify-center'>
+                <input
+                  className='p-6 bg-gray-400 rounded-lg'
+                  placeholder='Type a message'
+                />
+              </div>
+            </div>
+            {/* Members bar in the right */}
+            <div>{}</div>
           </div>
         </div>
       </div>

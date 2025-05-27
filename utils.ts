@@ -8,3 +8,9 @@ export const getDataFromToken = (request: NextRequest) => {
 
   return decodedToken.userId;
 };
+
+export enum ChannelType {
+  CATEGORY,
+  TEXT,
+  AUDIO,
+}

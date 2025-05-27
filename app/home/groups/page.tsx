@@ -4,12 +4,20 @@ import GroupsList from '@/components/groups';
 import Header from '@/components/header';
 import SearchPage from '@/components/search';
 import axios from 'axios';
+import { Search, X } from 'lucide-react';
 import { useEffect, useRef, useState } from 'react';
+enum ModalType {
+  SEARCH_MODAL,
+  CREATE_GROUP_MODAL,
+}
 
 export default function GroupPage() {
   const [groups, setGroups] = useState([]);
   const [isSearching, setIsSearching] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
+  const [isCreatingGroup, setisCreatingGroup] = useState(false);
+  const [listOfSearches, setlistOfSearches] = useState<any[]>([]);
+  const [isModalOpen, setisModalOpen] = useState<false | ModalType>(false);
   const searchRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
 
@@ -21,14 +29,12 @@ export default function GroupPage() {
         const res = await axios.get('/api/users/getUser');
         setDms(res.data.data.dms);
         setGroups(res.data.data.groups);
+        const { dms, groups }: { dms: any[]; groups: any[] } = res.data.data;
+        setlistOfSearches(dms.concat(groups));
       } catch (err: any) {}
     }
     fetchBoth();
   }, []);
-
-  let listOfSearches: string[] = [];
-  groups.forEach((g: any) => listOfSearches.push(g.name));
-  dms.forEach((d: any) => listOfSearches.push(d.name));
 
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
@@ -36,17 +42,17 @@ export default function GroupPage() {
         searchRef.current &&
         !searchRef.current.contains(event.target as Node)
       ) {
-        setIsSearching(false);
+        setisModalOpen(false);
       }
     };
 
     const handleKeyDown = (event: KeyboardEvent) => {
       if (event.key === 'Escape') {
-        setIsSearching(false);
+        setisModalOpen(false);
       }
     };
 
-    if (isSearching) {
+    if (isModalOpen) {
       document.addEventListener('mousedown', handleClickOutside);
       document.addEventListener('keydown', handleKeyDown);
       inputRef.current?.focus();
@@ -56,16 +62,7 @@ export default function GroupPage() {
       document.removeEventListener('mousedown', handleClickOutside);
       document.removeEventListener('keydown', handleKeyDown);
     };
-  }, [isSearching]);
-  useEffect(() => {
-    async function fetchGroups() {
-      try {
-        const res = await axios.get('/api/users/getUser');
-        setGroups(res.data.data.groups);
-      } catch (err: any) {}
-    }
-    fetchGroups();
-  }, []);
+  }, [isModalOpen]);
 
   return (
     <div className='flex'>
@@ -74,7 +71,7 @@ export default function GroupPage() {
       </div>
       <div className='w-full bg-gray-900'>
         <Header setIsSearching={setIsSearching} title='Groups' />
-        <GroupsList groups={groups} />
+        <GroupsList setisCreatingGroup={setisCreatingGroup} groups={groups} />
       </div>
       {isSearching && (
         <SearchPage
@@ -85,6 +82,28 @@ export default function GroupPage() {
           setSearchQuery={setSearchQuery}
           listOfSearches={listOfSearches}
         />
+      )}
+      {isModalOpen && (
+        <div className='mt-4'>
+          <p className='px-2 pb-2 text-gray-400 text-sm'>
+            Results for <span className='text-white'>"{searchQuery}"</span>
+          </p>
+          <div className='space-y-1'>
+            {listOfSearches
+              .filter((i) =>
+                i.toLowerCase().includes(searchQuery.toLowerCase())
+              )
+              .map((i) => (
+                <button
+                  key={i}
+                  className='w-full text-left p-3 rounded-md hover:bg-gray-700/50 transition-colors flex items-center gap-2'
+                >
+                  <Search className='w-4 h-4 text-gray-400 flex-shrink-0' />
+                  <span className='truncate'>{i}</span>
+                </button>
+              ))}
+          </div>
+        </div>
       )}
     </div>
   );
