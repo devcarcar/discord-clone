@@ -14,10 +14,10 @@ interface Group {
 
 export default function GroupsList({
   groups,
-  setisCreatingGroup,
+  setIsModalOpen,
 }: {
   groups: string[];
-  setisCreatingGroup: any;
+  setIsModalOpen: any;
 }) {
   const router = useRouter();
   const [groupData, setGroupData] = useState<Group[]>([]);
@@ -57,9 +57,7 @@ export default function GroupsList({
   return (
     <div className='grid grid-cols-3 gap-[50px] p-[50px]'>
       <div className='group relative'>
-        <button onClick={() => setisCreatingGroup(true)}>
-          Create new group
-        </button>
+        <button onClick={setIsModalOpen(2)}>Create new group</button>
       </div>
       {groupData.map((group) => (
         <div className='group relative' key={group.groupId}>

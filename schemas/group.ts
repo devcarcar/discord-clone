@@ -1,5 +1,6 @@
 import { ChannelType } from '@/utils';
 import { Schema, model, models } from 'mongoose';
+import { v4 as uuidv4 } from 'uuid';
 
 interface Channel {
   channelId: string;
@@ -10,7 +11,12 @@ interface Channel {
 }
 
 const group = new Schema({
-  groupId: { type: String, required: true, default: 'brawl-stars' },
+  groupId: {
+    type: String,
+    required: true,
+    default: () => uuidv4(),
+    unique: true,
+  },
   name: { type: String, required: true, default: 'Brawl Stars' },
   description: {
     type: String,

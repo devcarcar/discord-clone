@@ -73,7 +73,6 @@ export default function DmsPage() {
         <Navbar page={2} />
       </div>
       <div className='w-full bg-gray-900'>
-        <Header setIsSearching={setIsSearching} title='Direct Messages' />
         <DmsList arr={dms} />
       </div>
       {isSearching && (

@@ -116,7 +116,6 @@ export default function ExactGroup() {
         <Navbar page={1} />
       </div>
       <div className='w-full bg-gray-900'>
-        <Header setIsSearching={setIsSearching} title='Groups' />
         <div className='flex'>
           <div className='w-[220px] border-r h-screen text-gray-400 border-gray-700 bg-gray-800'>
             {categories.map((cat) => (

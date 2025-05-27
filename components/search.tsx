@@ -13,7 +13,7 @@ export default function SearchPage({
   searchQuery: any;
   setSearchQuery: Function;
   setIsSearching: Function;
-  listOfSearches: any[];
+  listOfSearches: any;
 }) {
   return (
     <div className='fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-start justify-center pt-20'>
@@ -46,19 +46,19 @@ export default function SearchPage({
               Results for <span className='text-white'>"{searchQuery}"</span>
             </p>
             <div className='space-y-1'>
-              {listOfSearches
-                .filter((i) =>
-                  i.toLowerCase().includes(searchQuery.toLowerCase())
-                )
-                .map((i) => (
-                  <button
-                    key={i}
-                    className='w-full text-left p-3 rounded-md hover:bg-gray-700/50 transition-colors flex items-center gap-2'
-                  >
-                    <Search className='w-4 h-4 text-gray-400 flex-shrink-0' />
-                    <span className='truncate'>{i}</span>
-                  </button>
-                ))}
+              {listOfSearches.map((i: any) => {
+                if (typeof i === typeof {}) i = i?.name;
+                if (i.toLowerCase().includes(searchQuery.toLowerCase()))
+                  return (
+                    <button
+                      key={i}
+                      className='w-full text-left p-3 rounded-md hover:bg-gray-700/50 transition-colors flex items-center gap-2'
+                    >
+                      <Search className='w-4 h-4 text-gray-400 flex-shrink-0' />
+                      <span className='truncate'>{i}</span>
+                    </button>
+                  );
+              })}
             </div>
           </div>
         )}

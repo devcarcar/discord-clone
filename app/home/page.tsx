@@ -4,6 +4,7 @@ import Header from '@/components/header';
 import SearchPage from '@/components/search';
 import axios from 'axios';
 import { Bell, Search, Sparkles, X } from 'lucide-react';
+import Link from 'next/link';
 import { useEffect, useRef, useState } from 'react';
 
 export default function Home() {
@@ -75,7 +76,6 @@ export default function Home() {
     <div className='flex min-h-screen bg-gray-900 text-gray-100'>
       <Navbar page={0} />
       <main className='flex-1 overflow-hidden'>
-        <Header setIsSearching={setIsSearching} title='Home' />
         <div className='p-6'>
           <div className='border h-[100px] border-gray-700 bg-transparent flex items-center p-6 rounded-lg'>
             <div className='p-3 rounded-full bg-blue-600/20'>
@@ -121,16 +121,6 @@ export default function Home() {
             ))}
           </div>
         </div>
-        {isSearching && (
-          <SearchPage
-            inputRef={inputRef}
-            searchRef={searchRef}
-            searchQuery={searchQuery}
-            setIsSearching={setIsSearching}
-            setSearchQuery={setSearchQuery}
-            listOfSearches={listOfSearches}
-          />
-        )}
       </main>
     </div>
   );
