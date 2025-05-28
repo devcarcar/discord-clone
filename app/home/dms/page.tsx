@@ -69,9 +69,6 @@ export default function DmsPage() {
 
   return (
     <div className='flex'>
-      <div>
-        <Navbar page={2} />
-      </div>
       <div className='w-full bg-gray-900'>
         <DmsList arr={dms} />
       </div>

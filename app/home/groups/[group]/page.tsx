@@ -1,14 +1,10 @@
 'use client';
 import Navbar from '@/components/Navbar';
-import GroupsList from '@/components/groups';
-import Header from '@/components/header';
 import SearchModal from '@/components/modals/searchModal';
-import SearchPage from '@/components/search';
 import { ModalType } from '@/helper';
 import { ChannelType } from '@/utils';
 import axios from 'axios';
 import { Bell, ChevronDown, Hash, Mic, Search } from 'lucide-react';
-import { Group } from 'next/dist/shared/lib/router/utils/route-regex';
 import { useParams, useRouter } from 'next/navigation';
 import { useEffect, useRef, useState } from 'react';
 
@@ -17,7 +13,6 @@ export default function ExactGroup() {
   const group = params.group;
   const [groups, setGroups] = useState([]);
   const [searchResults, setSearchResults] = useState<any[]>([]);
-  const [isSearching, setIsSearching] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
   const [isLoading, setisLoading] = useState(true);
   const [isModalOpen, setIsModalOpen] = useState<false | ModalType>(false);
@@ -44,24 +39,23 @@ export default function ExactGroup() {
   let listOfSearches: string[] = [];
   groups.forEach((g: any) => listOfSearches.push(g.name));
   dms.forEach((d: any) => listOfSearches.push(d.name));
-
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
       if (
         searchRef.current &&
         !searchRef.current.contains(event.target as Node)
       ) {
-        setIsSearching(false);
+        setIsModalOpen(false);
       }
     };
 
     const handleKeyDown = (event: KeyboardEvent) => {
       if (event.key === 'Escape') {
-        setIsSearching(false);
+        setIsModalOpen(false);
       }
     };
 
-    if (isSearching) {
+    if (isModalOpen) {
       document.addEventListener('mousedown', handleClickOutside);
       document.addEventListener('keydown', handleKeyDown);
       inputRef.current?.focus();
@@ -71,7 +65,7 @@ export default function ExactGroup() {
       document.removeEventListener('mousedown', handleClickOutside);
       document.removeEventListener('keydown', handleKeyDown);
     };
-  }, [isSearching]);
+  }, [isModalOpen]);
   useEffect(() => {
     async function fetchGroups() {
       try {
@@ -131,9 +125,6 @@ export default function ExactGroup() {
   if (isLoading) return <div>Loading</div>;
   return (
     <div className='flex'>
-      <div>
-        <Navbar page={1} />
-      </div>
       <div className='w-full bg-gray-900'>
         <header className='border-b border-gray-700 p-4 flex justify-between items-center'>
           <h1 className='text-xl font-semibold'>Groups</h1>

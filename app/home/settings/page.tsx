@@ -57,7 +57,6 @@ export default function SettingsPage() {
     return <div className='h-screen w-screen bg-gray-900'>Loading...</div>;
   return (
     <div className='bg-gray-900 flex min-h-screen w-screen'>
-      <Navbar page={3} />
       <main className='flex-1 overflow-y-auto'>
         <div className='border-b border-gray-800 p-4 sticky top-0 bg-gray-900/80 backdrop-blur-sm z-10'>
           <div className='flex items-center gap-4'>

@@ -74,7 +74,6 @@ export default function Home() {
   }, [isSearching]);
   return (
     <div className='flex min-h-screen bg-gray-900 text-gray-100'>
-      <Navbar page={0} />
       <main className='flex-1 overflow-hidden'>
         <div className='p-6'>
           <div className='border h-[100px] border-gray-700 bg-transparent flex items-center p-6 rounded-lg'>

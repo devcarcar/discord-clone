@@ -120,8 +120,6 @@ export default function GroupPage() {
 
   return (
     <div className='flex'>
-      <Navbar page={1} />
-
       <div className='w-full bg-gray-900'>
         <header className='border-b border-gray-700 p-4 flex justify-between items-center'>
           <h1 className='text-xl font-semibold'>Groups</h1>

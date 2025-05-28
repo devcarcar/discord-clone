@@ -1,6 +1,5 @@
 import connectDb from '@/lib/mongodb';
 import User from '../../../schemas/user';
-import Group from '../../../schemas/group';
 import { NextResponse } from 'next/server';
 
 export async function POST(request) {
@@ -9,8 +8,6 @@ export async function POST(request) {
     const { email, password } = await request.json();
     const newUser = new User({ email: email, password: password });
     await newUser.save();
-    const newGrp = new Group({ email: email, password: password });
-    await newGrp.save();
     return NextResponse.json(newUser, { status: 201 });
   } catch (e) {
     console.log(e);

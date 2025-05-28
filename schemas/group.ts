@@ -2,14 +2,6 @@ import { ChannelType } from '@/utils';
 import { Schema, model, models } from 'mongoose';
 import { v4 as uuidv4 } from 'uuid';
 
-interface Channel {
-  channelId: string;
-  type: ChannelType;
-  parent?: string;
-  name: string;
-  channelList?: any[];
-}
-
 const group = new Schema({
   groupId: {
     type: String,
@@ -44,11 +36,13 @@ const group = new Schema({
         channelId: 'vc',
         type: 2,
         name: 'vc',
+        parent: 'general',
       },
       {
         channelId: 'chat',
         type: 1,
         name: 'chat',
+        parent: 'general',
       },
     ],
   },
