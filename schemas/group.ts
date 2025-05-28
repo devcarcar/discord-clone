@@ -21,7 +21,7 @@ const group = new Schema({
   description: {
     type: String,
     required: true,
-    default: 'Brawl Stars Official Server',
+    default: 'Group description',
   },
   icon: {
     type: String,
@@ -37,19 +37,18 @@ const group = new Schema({
     default: [
       {
         channelId: 'general',
-        type: ChannelType.CATEGORY,
+        type: 0,
         name: 'general',
       },
       {
-        channelId: 'general-chat',
-        type: ChannelType.TEXT,
-        parent: 'general',
-        name: 'General Chat',
+        channelId: 'vc',
+        type: 2,
+        name: 'vc',
       },
       {
-        channelId: 'vc-1',
-        type: ChannelType.AUDIO,
-        name: 'Voice call',
+        channelId: 'chat',
+        type: 1,
+        name: 'chat',
       },
     ],
   },
