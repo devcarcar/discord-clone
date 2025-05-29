@@ -124,47 +124,50 @@ export default function GroupPage() {
   }, [isModalOpen]);
 
   return (
-    <div className='flex w-screen'>
-      <div className='w-full bg-gray-900'>
-        <Header setIsModalOpen={setIsModalOpen} title='Groups' />
+    <div className='flex h-screen w-screen'>
+      <Navbar page={0} />
+      <div className='flex w-screen'>
+        <div className='w-full bg-gray-900'>
+          <Header setIsModalOpen={setIsModalOpen} title='Groups' />
 
-        <div className='grid grid-cols-3 gap-[50px] p-[50px]'>
-          <div className='group relative'>
-            <button
-              onClick={() => setIsModalOpen(ModalType.CREATE_GROUP_MODAL)}
-              className='border-4 border-dashed border-gray-500 w-full h-full rounded-lg hover:border-gray-400 transition-colors duration-300 p-8 text-gray-400 hover:text-white'
-            >
-              + Create new group
-            </button>
-          </div>
-
-          {isLoading ? (
-            <div className='col-span-2 flex items-center justify-center'>
-              Loading groups...
+          <div className='grid grid-cols-3 gap-[50px] p-[50px]'>
+            <div className='group relative'>
+              <button
+                onClick={() => setIsModalOpen(ModalType.CREATE_GROUP_MODAL)}
+                className='border-4 border-dashed border-gray-500 w-full h-full rounded-lg hover:border-gray-400 transition-colors duration-300 p-8 text-gray-400 hover:text-white'
+              >
+                + Create new group
+              </button>
             </div>
-          ) : (
-            groupData.map(GroupCard)
-          )}
+
+            {isLoading ? (
+              <div className='col-span-2 flex items-center justify-center'>
+                Loading groups...
+              </div>
+            ) : (
+              groupData.map(GroupCard)
+            )}
+          </div>
+          {isModalOpen === ModalType.SEARCH_MODAL &&
+            SearchModal({
+              searchRef,
+              inputRef,
+              searchQuery,
+              setSearchQuery,
+              setIsModalOpen,
+              searchResults,
+            })}
+          {isModalOpen === ModalType.CREATE_GROUP_MODAL &&
+            createGroupModal({
+              searchRef,
+              pic,
+              setPic,
+              groupName,
+              setGroupName,
+              handleCreateGroup,
+              setgroupCreated,
+            })}
         </div>
-        {isModalOpen === ModalType.SEARCH_MODAL &&
-          SearchModal({
-            searchRef,
-            inputRef,
-            searchQuery,
-            setSearchQuery,
-            setIsModalOpen,
-            searchResults,
-          })}
-        {isModalOpen === ModalType.CREATE_GROUP_MODAL &&
-          createGroupModal({
-            searchRef,
-            pic,
-            setPic,
-            groupName,
-            setGroupName,
-            handleCreateGroup,
-            setgroupCreated,
-          })}
       </div>
     </div>
   );

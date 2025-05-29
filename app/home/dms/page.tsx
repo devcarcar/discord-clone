@@ -72,20 +72,23 @@ export default function DmsPage() {
   }, []);
 
   return (
-    <div className='flex w-screen'>
-      <div className='w-full bg-gray-900'>
-        <Header title='Direct Messages' setIsModalOpen={setIsModalOpen} />
-        <DmsList arr={dms} />
+    <div className='flex h-screen w-screen'>
+      <Navbar page={0} />
+      <div className='flex w-screen'>
+        <div className='w-full bg-gray-900'>
+          <Header title='Direct Messages' setIsModalOpen={setIsModalOpen} />
+          <DmsList arr={dms} />
+        </div>
+        {isModalOpen &&
+          SearchModal({
+            searchRef,
+            inputRef,
+            searchQuery,
+            setSearchQuery,
+            setIsModalOpen,
+            searchResults,
+          })}
       </div>
-      {isModalOpen &&
-        SearchModal({
-          searchRef,
-          inputRef,
-          searchQuery,
-          setSearchQuery,
-          setIsModalOpen,
-          searchResults,
-        })}
     </div>
   );
 }
