@@ -1,0 +1,589 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Enhanced Chat App</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://unpkg.com/lucide@latest"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            primary: '#6366f1',
+            secondary: '#8b5cf6',
+            dark: '#1e293b',
+            darker: '#0f172a',
+            accent: '#ec4899',
+          }
+        }
+      }
+    }
+  </script>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+    body {
+      font-family: 'Inter', sans-serif;
+    }
+    .channel-active {
+      background: linear-gradient(90deg, rgba(99,102,241,0.2) 0%, rgba(99,102,241,0) 100%);
+      border-left: 3px solid #6366f1;
+    }
+    .message-bubble {
+      border-radius: 18px;
+      border-bottom-left-radius: 4px;
+    }
+    .message-bubble.self {
+      border-radius: 18px;
+      border-bottom-right-radius: 4px;
+      background: linear-gradient(135deg, #6366f1, #8b5cf6);
+    }
+    .scrollbar-hide::-webkit-scrollbar {
+      display: none;
+    }
+    .scrollbar-hide {
+      -ms-overflow-style: none;
+      scrollbar-width: none;
+    }
+    .fade-in {
+      animation: fadeIn 0.3s ease-in;
+    }
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(10px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+  </style>
+</head>
+<body class="bg-darker text-gray-100">
+  <div class="flex h-screen overflow-hidden">
+    <!-- Navigation Sidebar -->
+    <div class="w-20 bg-dark flex flex-col items-center py-4 border-r border-gray-800">
+      <div class="mb-8">
+        <div class="w-10 h-10 rounded-lg bg-primary flex items-center justify-center">
+          <i class="fas fa-comments text-white"></i>
+        </div>
+      </div>
+      
+      <nav class="flex flex-col items-center space-y-6">
+        <button id="home-btn" class="p-3 rounded-lg bg-primary text-white">
+          <i class="fas fa-home"></i>
+        </button>
+        <button id="groups-btn" class="p-3 rounded-lg hover:bg-gray-700 text-gray-400">
+          <i class="fas fa-users"></i>
+        </button>
+        <button id="dms-btn" class="p-3 rounded-lg hover:bg-gray-700 text-gray-400">
+          <i class="fas fa-comment-dots"></i>
+        </button>
+        <button id="activity-btn" class="p-3 rounded-lg hover:bg-gray-700 text-gray-400">
+          <i class="fas fa-bell"></i>
+        </button>
+      </nav>
+      
+      <div class="mt-auto">
+        <button id="settings-btn" class="p-3 rounded-lg hover:bg-gray-700 text-gray-400">
+          <i class="fas fa-cog"></i>
+        </button>
+      </div>
+    </div>
+    
+    <!-- Main Content Area -->
+    <div class="flex-1 flex flex-col overflow-hidden">
+      <!-- Top Bar -->
+      <div class="h-16 border-b border-gray-800 flex items-center justify-between px-6">
+        <div>
+          <h1 class="font-bold text-xl" id="page-title">Home Dashboard</h1>
+          <p class="text-sm text-gray-400" id="page-description">Overview of your recent activities</p>
+        </div>
+        <div class="flex items-center space-x-4">
+          <div class="relative">
+            <button class="p-2 rounded-full hover:bg-gray-800">
+              <i class="fas fa-bell text-gray-400"></i>
+            </button>
+            <span class="absolute top-1 right-1 w-2 h-2 bg-red-500 rounded-full"></span>
+          </div>
+          <div class="flex items-center space-x-2">
+            <div class="w-8 h-8 rounded-full bg-gradient-to-br from-primary to-secondary flex items-center justify-center">
+              <span class="font-bold text-xs">AJ</span>
+            </div>
+            <span class="font-medium">Alex Johnson</span>
+          </div>
+        </div>
+      </div>
+      
+      <!-- Page Content -->
+      <div class="flex-1 overflow-auto p-6 scrollbar-hide" id="page-content">
+        <!-- Content will be injected here -->
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // Sample data
+    const users = [
+      { id: 1, name: "Alex Johnson", avatar: "AJ", online: true, lastSeen: "Just now" },
+      { id: 2, name: "Sam Wilson", avatar: "SW", online: false, lastSeen: "2 hours ago" },
+      { id: 3, name: "Taylor Swift", avatar: "TS", online: true, lastSeen: "Online" },
+      { id: 4, name: "Jamie Smith", avatar: "JS", online: true, lastSeen: "Online" },
+      { id: 5, name: "Jordan Lee", avatar: "JL", online: false, lastSeen: "5 hours ago" }
+    ];
+
+    const groups = [
+      { id: 1, name: "Design Team", unread: 3, members: 8, lastMessage: "Let's schedule a meeting..." },
+      { id: 2, name: "Developers", unread: 0, members: 12, lastMessage: "The new API is ready" },
+      { id: 3, name: "Marketing", unread: 7, members: 5, lastMessage: "Campaign results are in!" },
+      { id: 4, name: "Leadership", unread: 0, members: 4, lastMessage: "Budget meeting tomorrow" }
+    ];
+
+    const activities = [
+      { id: 1, name: "Team Standup", time: "9:00 AM", participants: 8 },
+      { id: 2, name: "Sprint Planning", time: "2:00 PM", participants: 12 },
+      { id: 3, name: "Client Meeting", time: "4:30 PM", participants: 4 }
+    ];
+
+    const messages = [
+      { id: 1, sender: "Sam Wilson", content: "Hey team, are we meeting today?", time: "9:30 AM", self: false },
+      { id: 2, sender: "You", content: "Yes, in 30 minutes. Don't forget the presentation!", time: "9:32 AM", self: true },
+      { id: 3, sender: "Taylor Swift", content: "I'll join a bit late, finishing up the designs", time: "9:33 AM", self: false },
+      { id: 4, sender: "Jamie Smith", content: "No problem Taylor. Can you share the latest mockups?", time: "9:35 AM", self: false },
+      { id: 5, sender: "You", content: "I've uploaded them to the shared drive", time: "9:36 AM", self: true },
+    ];
+
+    // Templates
+    const homePage = `
+      <div class="space-y-6">
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+          <!-- Welcome Card -->
+          <div class="bg-gradient-to-br from-gray-800 to-darker border border-gray-700 rounded-xl p-6 md:col-span-2">
+            <div class="flex justify-between items-start">
+              <div>
+                <h2 class="text-xl font-bold">Welcome back, Alex!</h2>
+                <p class="text-gray-400 mt-2">You have 3 new messages and 2 upcoming activities</p>
+              </div>
+              <div class="w-14 h-14 rounded-full bg-gradient-to-br from-primary to-secondary flex items-center justify-center">
+                <i class="fas fa-comment-alt text-white text-xl"></i>
+              </div>
+            </div>
+            <div class="mt-6 flex space-x-4">
+              <button class="px-4 py-2 bg-primary rounded-lg flex items-center space-x-2">
+                <i class="fas fa-comment"></i>
+                <span>Check Messages</span>
+              </button>
+              <button class="px-4 py-2 border border-gray-700 rounded-lg flex items-center space-x-2">
+                <i class="fas fa-calendar"></i>
+                <span>View Calendar</span>
+              </button>
+            </div>
+          </div>
+          
+          <!-- Stats Card -->
+          <div class="bg-gradient-to-br from-gray-800 to-darker border border-gray-700 rounded-xl p-6">
+            <h3 class="font-bold">Your Activity</h3>
+            <div class="mt-4 space-y-4">
+              <div class="flex items-center">
+                <div class="w-10 h-10 rounded-lg bg-blue-500/20 flex items-center justify-center">
+                  <i class="fas fa-comments text-blue-400"></i>
+                </div>
+                <div class="ml-3">
+                  <p class="font-medium">Messages Sent</p>
+                  <p class="text-gray-400 text-sm">24 this week</p>
+                </div>
+              </div>
+              <div class="flex items-center">
+                <div class="w-10 h-10 rounded-lg bg-green-500/20 flex items-center justify-center">
+                  <i class="fas fa-user-friends text-green-400"></i>
+                </div>
+                <div class="ml-3">
+                  <p class="font-medium">Groups</p>
+                  <p class="text-gray-400 text-sm">4 active</p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <!-- Upcoming Activities -->
+          <div class="bg-gradient-to-br from-gray-800 to-darker border border-gray-700 rounded-xl p-6">
+            <div class="flex justify-between items-center">
+              <h3 class="font-bold text-lg">Upcoming Activities</h3>
+              <button class="text-primary text-sm">View All</button>
+            </div>
+            <div class="mt-4 space-y-4">
+              ${activities.map(activity => `
+                <div class="flex items-center p-3 rounded-lg hover:bg-gray-800/50 transition-all cursor-pointer">
+                  <div class="w-12 h-12 rounded-lg bg-purple-500/20 flex items-center justify-center">
+                    <i class="fas fa-calendar-day text-purple-400"></i>
+                  </div>
+                  <div class="ml-4 flex-1">
+                    <p class="font-medium">${activity.name}</p>
+                    <div class="flex justify-between items-center mt-1">
+                      <span class="text-sm text-gray-400">${activity.time}</span>
+                      <span class="text-sm text-gray-400">${activity.participants} participants</span>
+                    </div>
+                  </div>
+                </div>
+              `).join('')}
+            </div>
+          </div>
+          
+          <!-- Recent Messages -->
+          <div class="bg-gradient-to-br from-gray-800 to-darker border border-gray-700 rounded-xl p-6">
+            <div class="flex justify-between items-center">
+              <h3 class="font-bold text-lg">Recent Messages</h3>
+              <button class="text-primary text-sm">View All</button>
+            </div>
+            <div class="mt-4 space-y-4">
+              ${users.slice(0, 3).map(user => `
+                <div class="flex items-center p-3 rounded-lg hover:bg-gray-800/50 transition-all cursor-pointer">
+                  <div class="relative">
+                    <div class="w-10 h-10 rounded-full bg-gradient-to-br from-primary to-secondary flex items-center justify-center">
+                      <span class="font-bold text-xs">${user.avatar}</span>
+                    </div>
+                    ${user.online ? '<div class="absolute bottom-0 right-0 w-3 h-3 bg-green-500 rounded-full border-2 border-gray-800"></div>' : ''}
+                  </div>
+                  <div class="ml-4 flex-1">
+                    <div class="flex justify-between items-center">
+                      <p class="font-medium">${user.name}</p>
+                      <span class="text-xs text-gray-400">${user.lastSeen}</span>
+                    </div>
+                    <p class="text-sm text-gray-400 truncate">Last message preview...</p>
+                  </div>
+                </div>
+              `).join('')}
+            </div>
+          </div>
+        </div>
+      </div>
+    `;
+
+    const groupsPage = `
+      <div>
+        <div class="flex justify-between items-center mb-6">
+          <h2 class="text-2xl font-bold">Your Groups</h2>
+          <button class="px-4 py-2 bg-primary rounded-lg flex items-center space-x-2">
+            <i class="fas fa-plus"></i>
+            <span>Create Group</span>
+          </button>
+        </div>
+        
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+          ${groups.map(group => `
+            <div class="bg-gradient-to-br from-gray-800 to-darker border border-gray-700 rounded-xl p-6 hover:border-primary/50 transition-all">
+              <div class="flex justify-between items-start">
+                <div>
+                  <h3 class="font-bold text-lg">${group.name}</h3>
+                  <p class="text-gray-400 mt-1">${group.members} members</p>
+                </div>
+                ${group.unread > 0 ? `
+                  <span class="bg-primary text-white text-xs font-bold rounded-full h-6 w-6 flex items-center justify-center">
+                    ${group.unread}
+                  </span>
+                ` : ''}
+              </div>
+              
+              <div class="mt-4 flex items-center">
+                <div class="flex -space-x-2">
+                  ${users.slice(0, 3).map(user => `
+                    <div class="w-8 h-8 rounded-full bg-gradient-to-br from-primary to-secondary flex items-center justify-center border-2 border-gray-800">
+                      <span class="text-xs">${user.avatar}</span>
+                    </div>
+                  `).join('')}
+                  ${group.members > 3 ? `
+                    <div class="w-8 h-8 rounded-full bg-gray-700 flex items-center justify-center border-2 border-gray-800">
+                      <span class="text-xs">+${group.members - 3}</span>
+                    </div>
+                  ` : ''}
+                </div>
+                <div class="ml-4">
+                  <p class="text-sm text-gray-400 truncate">${group.lastMessage}</p>
+                </div>
+              </div>
+              
+              <div class="mt-6 flex justify-between">
+                <button class="text-sm text-gray-400 hover:text-white">
+                  <i class="fas fa-comment mr-2"></i>Send Message
+                </button>
+                <button class="text-sm text-gray-400 hover:text-white">
+                  <i class="fas fa-cog mr-2"></i>Manage
+                </button>
+              </div>
+            </div>
+          `).join('')}
+        </div>
+      </div>
+    `;
+
+    const dmsPage = `
+      <div>
+        <div class="flex justify-between items-center mb-6">
+          <h2 class="text-2xl font-bold">Direct Messages</h2>
+          <button class="px-4 py-2 bg-primary rounded-lg flex items-center space-x-2">
+            <i class="fas fa-plus"></i>
+            <span>New Message</span>
+          </button>
+        </div>
+        
+        <div class="bg-gradient-to-br from-gray-800 to-darker border border-gray-700 rounded-xl overflow-hidden">
+          <div class="p-4 border-b border-gray-700">
+            <div class="relative">
+              <i class="fas fa-search absolute left-3 top-3 text-gray-500"></i>
+              <input type="text" placeholder="Search messages..." class="w-full bg-gray-900 rounded-lg pl-10 pr-4 py-2 focus:outline-none focus:ring-2 focus:ring-primary/50">
+            </div>
+          </div>
+          
+          <div class="divide-y divide-gray-800">
+            ${users.map(user => `
+              <div class="p-4 flex items-center hover:bg-gray-800/50 cursor-pointer">
+                <div class="relative">
+                  <div class="w-12 h-12 rounded-full bg-gradient-to-br from-primary to-secondary flex items-center justify-center">
+                    <span class="font-bold">${user.avatar}</span>
+                  </div>
+                  ${user.online ? '<div class="absolute bottom-0 right-0 w-3 h-3 bg-green-500 rounded-full border-2 border-gray-800"></div>' : ''}
+                </div>
+                <div class="ml-4 flex-1">
+                  <div class="flex justify-between items-center">
+                    <h3 class="font-medium">${user.name}</h3>
+                    <span class="text-xs text-gray-400">${user.lastSeen}</span>
+                  </div>
+                  <p class="text-sm text-gray-400 truncate mt-1">Last message preview with ${user.name}...</p>
+                </div>
+              </div>
+            `).join('')}
+          </div>
+        </div>
+      </div>
+    `;
+
+    const settingsPage = `
+      <div class="max-w-4xl mx-auto">
+        <div class="mb-8">
+          <h2 class="text-2xl font-bold">Account Settings</h2>
+          <p class="text-gray-400">Manage your profile and account preferences</p>
+        </div>
+        
+        <div class="bg-gradient-to-br from-gray-800 to-darker border border-gray-700 rounded-xl overflow-hidden">
+          <!-- Profile Section -->
+          <div class="p-6 border-b border-gray-700">
+            <div class="flex flex-col md:flex-row items-start">
+              <div class="mb-6 md:mb-0 md:mr-6">
+                <div class="relative">
+                  <div class="w-24 h-24 rounded-full bg-gradient-to-br from-primary to-secondary flex items-center justify-center">
+                    <span class="font-bold text-xl">AJ</span>
+                  </div>
+                  <button class="absolute bottom-0 right-0 w-8 h-8 rounded-full bg-gray-800 border-2 border-gray-900 flex items-center justify-center">
+                    <i class="fas fa-camera text-sm"></i>
+                  </button>
+                </div>
+              </div>
+              <div class="flex-1">
+                <h3 class="text-xl font-bold">Alex Johnson</h3>
+                <p class="text-gray-400">Software Engineer</p>
+                <p class="mt-4 text-gray-300"><i class="fas fa-envelope mr-2"></i>alex.johnson@example.com</p>
+                <p class="mt-1 text-gray-300"><i class="fas fa-map-marker-alt mr-2"></i>San Francisco, CA</p>
+                <button class="mt-4 px-4 py-2 border border-gray-700 rounded-lg hover:bg-gray-700 transition-colors">
+                  Edit Profile
+                </button>
+              </div>
+            </div>
+          </div>
+          
+          <!-- Settings Sections -->
+          <div class="p-6 border-b border-gray-700">
+            <h3 class="text-lg font-bold mb-4">Account Preferences</h3>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div class="bg-gray-800/30 rounded-lg p-4">
+                <div class="flex items-center">
+                  <div class="w-10 h-10 rounded-lg bg-blue-500/20 flex items-center justify-center mr-3">
+                    <i class="fas fa-bell text-blue-400"></i>
+                  </div>
+                  <div>
+                    <h4 class="font-medium">Notifications</h4>
+                    <p class="text-sm text-gray-400">Manage alerts</p>
+                  </div>
+                </div>
+              </div>
+              <div class="bg-gray-800/30 rounded-lg p-4">
+                <div class="flex items-center">
+                  <div class="w-10 h-10 rounded-lg bg-purple-500/20 flex items-center justify-center mr-3">
+                    <i class="fas fa-lock text-purple-400"></i>
+                  </div>
+                  <div>
+                    <h4 class="font-medium">Privacy</h4>
+                    <p class="text-sm text-gray-400">Control visibility</p>
+                  </div>
+                </div>
+              </div>
+              <div class="bg-gray-800/30 rounded-lg p-4">
+                <div class="flex items-center">
+                  <div class="w-10 h-10 rounded-lg bg-green-500/20 flex items-center justify-center mr-3">
+                    <i class="fas fa-shield-alt text-green-400"></i>
+                  </div>
+                  <div>
+                    <h4 class="font-medium">Security</h4>
+                    <p class="text-sm text-gray-400">Password & 2FA</p>
+                  </div>
+                </div>
+              </div>
+              <div class="bg-gray-800/30 rounded-lg p-4">
+                <div class="flex items-center">
+                  <div class="w-10 h-10 rounded-lg bg-yellow-500/20 flex items-center justify-center mr-3">
+                    <i class="fas fa-paint-brush text-yellow-400"></i>
+                  </div>
+                  <div>
+                    <h4 class="font-medium">Appearance</h4>
+                    <p class="text-sm text-gray-400">Theme & display</p>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+          
+          <!-- Danger Zone -->
+          <div class="p-6">
+            <h3 class="text-lg font-bold mb-4 text-red-400">Danger Zone</h3>
+            <div class="bg-red-900/20 border border-red-800 rounded-lg p-4">
+              <div class="flex flex-col md:flex-row md:items-center justify-between">
+                <div>
+                  <h4 class="font-medium">Delete Account</h4>
+                  <p class="text-sm text-red-300">Permanently remove your account and all data</p>
+                </div>
+                <button class="mt-3 md:mt-0 px-4 py-2 bg-red-600 hover:bg-red-700 rounded-lg transition-colors">
+                  Delete Account
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    `;
+
+    const activityPage = `
+      <div>
+        <div class="flex justify-between items-center mb-6">
+          <h2 class="text-2xl font-bold">Recent Activity</h2>
+          <div class="flex space-x-2">
+            <button class="px-4 py-2 border border-gray-700 rounded-lg">Filter</button>
+            <button class="px-4 py-2 border border-gray-700 rounded-lg">Sort</button>
+          </div>
+        </div>
+        
+        <div class="space-y-4">
+          <div class="bg-gradient-to-br from-gray-800 to-darker border border-gray-700 rounded-xl p-5">
+            <div class="flex items-start">
+              <div class="w-12 h-12 rounded-full bg-gradient-to-br from-primary to-secondary flex items-center justify-center">
+                <i class="fas fa-users"></i>
+              </div>
+              <div class="ml-4 flex-1">
+                <div class="flex justify-between">
+                  <h3 class="font-bold">New group created</h3>
+                  <span class="text-sm text-gray-400">2 hours ago</span>
+                </div>
+                <p class="mt-1 text-gray-300">You created the <span class="text-primary">Design Team</span> group</p>
+                <div class="mt-3 flex -space-x-2">
+                  ${users.slice(0, 4).map(user => `
+                    <div class="w-8 h-8 rounded-full bg-gray-700 flex items-center justify-center border-2 border-gray-800">
+                      <span class="text-xs">${user.avatar}</span>
+                    </div>
+                  `).join('')}
+                </div>
+              </div>
+            </div>
+          </div>
+          
+          <div class="bg-gradient-to-br from-gray-800 to-darker border border-gray-700 rounded-xl p-5">
+            <div class="flex items-start">
+              <div class="w-12 h-12 rounded-full bg-green-500/20 flex items-center justify-center">
+                <i class="fas fa-comment-alt text-green-400"></i>
+              </div>
+              <div class="ml-4 flex-1">
+                <div class="flex justify-between">
+                  <h3 class="font-bold">Message received</h3>
+                  <span class="text-sm text-gray-400">4 hours ago</span>
+                </div>
+                <p class="mt-1 text-gray-300">You received a message from <span class="text-primary">Taylor Swift</span></p>
+                <div class="mt-3 bg-gray-800/50 rounded-lg p-3 border border-gray-700">
+                  <p class="text-gray-300">"Can you review the latest designs when you get a chance?"</p>
+                </div>
+              </div>
+            </div>
+          </div>
+          
+          <div class="bg-gradient-to-br from-gray-800 to-darker border border-gray-700 rounded-xl p-5">
+            <div class="flex items-start">
+              <div class="w-12 h-12 rounded-full bg-purple-500/20 flex items-center justify-center">
+                <i class="fas fa-user-plus text-purple-400"></i>
+              </div>
+              <div class="ml-4 flex-1">
+                <div class="flex justify-between">
+                  <h3 class="font-bold">New connection</h3>
+                  <span class="text-sm text-gray-400">1 day ago</span>
+                </div>
+                <p class="mt-1 text-gray-300"><span class="text-primary">Sam Wilson</span> accepted your connection request</p>
+                <div class="mt-3 flex items-center">
+                  <div class="w-10 h-10 rounded-full bg-gradient-to-br from-primary to-secondary flex items-center justify-center">
+                    <span class="font-bold text-xs">SW</span>
+                  </div>
+                  <div class="ml-3">
+                    <p class="font-medium">Sam Wilson</p>
+                    <p class="text-sm text-gray-400">Product Designer</p>
+                  </div>
+                  <button class="ml-auto px-3 py-1 border border-gray-700 rounded-lg text-sm">
+                    Message
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    `;
+
+    // Navigation functions
+    function navigateTo(page) {
+      const buttons = ['home-btn', 'groups-btn', 'dms-btn', 'activity-btn', 'settings-btn'];
+      buttons.forEach(btn => {
+        document.getElementById(btn).classList.remove('bg-primary', 'text-white');
+        document.getElementById(btn).classList.add('hover:bg-gray-700', 'text-gray-400');
+      });
+      
+      document.getElementById(`${page}-btn`).classList.add('bg-primary', 'text-white');
+      document.getElementById(`${page}-btn`).classList.remove('hover:bg-gray-700', 'text-gray-400');
+      
+      document.getElementById('page-content').innerHTML = 
+        page === 'home' ? homePage : 
+        page === 'groups' ? groupsPage : 
+        page === 'dms' ? dmsPage : 
+        page === 'activity' ? activityPage : settingsPage;
+        
+      document.getElementById('page-title').textContent = 
+        page === 'home' ? 'Home Dashboard' : 
+        page === 'groups' ? 'Groups' : 
+        page === 'dms' ? 'Direct Messages' : 
+        page === 'activity' ? 'Recent Activity' : 'Account Settings';
+        
+      document.getElementById('page-description').textContent = 
+        page === 'home' ? 'Overview of your recent activities' : 
+        page === 'groups' ? 'Manage your group conversations' : 
+        page === 'dms' ? 'Your personal conversations' : 
+        page === 'activity' ? 'Notifications and recent events' : 'Manage your profile and preferences';
+        
+      document.getElementById('page-content').classList.add('fade-in');
+      setTimeout(() => {
+        document.getElementById('page-content').classList.remove('fade-in');
+      }, 300);
+    }
+
+    // Initial load
+    navigateTo('home');
+
+    // Add event listeners
+    document.getElementById('home-btn').addEventListener('click', () => navigateTo('home'));
+    document.getElementById('groups-btn').addEventListener('click', () => navigateTo('groups'));
+    document.getElementById('dms-btn').addEventListener('click', () => navigateTo('dms'));
+    document.getElementById('activity-btn').addEventListener('click', () => navigateTo('activity'));
+    document.getElementById('settings-btn').addEventListener('click', () => navigateTo('settings'));
+  </script>
+</body>
+</html>
