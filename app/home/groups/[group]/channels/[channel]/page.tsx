@@ -1,5 +1,6 @@
 'use client';
 import Navbar from '@/components/Navbar';
+import Header from '@/components/header';
 import SearchModal from '@/components/modals/searchModal';
 import { ModalType } from '@/helper';
 import { ChannelType } from '@/utils';
@@ -200,23 +201,9 @@ export default function ExactGroup() {
     );
 
   return (
-    <div className='flex h-screen bg-gray-900 text-gray-100'>
+    <div className='flex w-screen h-screen bg-gray-900 text-gray-100'>
       <div className='flex flex-col flex-1 overflow-hidden'>
-        <header className='border-b border-gray-700 p-4 flex justify-between items-center bg-gray-800'>
-          <h1 className='text-xl font-semibold'>Groups</h1>
-          <div className='flex items-center gap-3'>
-            <button
-              onClick={() => setIsModalOpen(ModalType.SEARCH_MODAL)}
-              className='p-2 rounded-full hover:bg-gray-700 transition-colors'
-            >
-              <Search className='w-5 h-5 text-gray-400' />
-            </button>
-            <button className='p-2 rounded-full hover:bg-gray-700 transition-colors relative'>
-              <Bell className='w-5 h-5 text-gray-400' />
-              <span className='absolute top-1 right-1 w-2 h-2 bg-red-500 rounded-full'></span>
-            </button>
-          </div>
-        </header>
+        <Header setIsModalOpen={setIsModalOpen} title='Groups' />
         <div className='flex flex-1 overflow-hidden'>
           {/* Channels sidebar */}
           <div className='w-60 border-r border-gray-700 bg-gray-800 flex flex-col'>

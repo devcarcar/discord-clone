@@ -6,8 +6,12 @@ import { NextRequest, NextResponse } from 'next/server';
 export async function POST(request: NextRequest) {
   try {
     await connectDb();
-    const { name, user } = await request.json();
-    const newGrp = new Group({ name: name, members: [user.userId] });
+    const { name, user, icon } = await request.json();
+    const newGrp = new Group({
+      name: name,
+      members: [user.userId],
+      icon: icon,
+    });
     await newGrp.save();
     await User.findOneAndUpdate(
       { userId: user.userId },

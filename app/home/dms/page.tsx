@@ -2,15 +2,17 @@
 import Navbar from '@/components/Navbar';
 import DmsList from '@/components/dms';
 import Header from '@/components/header';
+import SearchModal from '@/components/modals/searchModal';
 import SearchPage from '@/components/search';
 import axios from 'axios';
 import { useEffect, useRef, useState } from 'react';
 
 export default function DmsPage() {
-  const [isSearching, setIsSearching] = useState(false);
+  const [isModalOpen, setIsModalOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
   const searchRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
+  const [searchResults, setSearchResults] = useState<any[]>([]);
 
   const [dms, setDms]: any[] = useState([]);
   const [groups, setGroups]: any[] = useState([]);
@@ -19,8 +21,10 @@ export default function DmsPage() {
     async function fetchBoth() {
       try {
         const res = await axios.get('/api/users/getUser');
-        setDms(res.data.data.dms);
-        setGroups(res.data.data.groups);
+        const { dms, groups } = res.data.data;
+        setDms(dms);
+        setGroups(groups);
+        setSearchResults([...dms, ...groups]);
       } catch (err: any) {}
     }
     fetchBoth();
@@ -36,17 +40,17 @@ export default function DmsPage() {
         searchRef.current &&
         !searchRef.current.contains(event.target as Node)
       ) {
-        setIsSearching(false);
+        setIsModalOpen(false);
       }
     };
 
     const handleKeyDown = (event: KeyboardEvent) => {
       if (event.key === 'Escape') {
-        setIsSearching(false);
+        setIsModalOpen(false);
       }
     };
 
-    if (isSearching) {
+    if (isModalOpen) {
       document.addEventListener('mousedown', handleClickOutside);
       document.addEventListener('keydown', handleKeyDown);
       inputRef.current?.focus();
@@ -56,7 +60,7 @@ export default function DmsPage() {
       document.removeEventListener('mousedown', handleClickOutside);
       document.removeEventListener('keydown', handleKeyDown);
     };
-  }, [isSearching]);
+  }, [isModalOpen]);
   useEffect(() => {
     async function fetchDms() {
       try {
@@ -68,20 +72,20 @@ export default function DmsPage() {
   }, []);
 
   return (
-    <div className='flex'>
+    <div className='flex w-screen'>
       <div className='w-full bg-gray-900'>
+        <Header title='Direct Messages' setIsModalOpen={setIsModalOpen} />
         <DmsList arr={dms} />
       </div>
-      {isSearching && (
-        <SearchPage
-          inputRef={inputRef}
-          searchRef={searchRef}
-          searchQuery={searchQuery}
-          setIsSearching={setIsSearching}
-          setSearchQuery={setSearchQuery}
-          listOfSearches={listOfSearches}
-        />
-      )}
+      {isModalOpen &&
+        SearchModal({
+          searchRef,
+          inputRef,
+          searchQuery,
+          setSearchQuery,
+          setIsModalOpen,
+          searchResults,
+        })}
     </div>
   );
 }

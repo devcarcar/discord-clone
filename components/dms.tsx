@@ -66,7 +66,7 @@ export default function DmsList({ arr }: { arr: Dm[] }) {
           <div className='group relative' key={i.id}>
             <button
               onClick={() => redirect(`/home/dms/${i.id}`)}
-              className='border-4 border-white w-full h-full rounded-lg shadow-md hover:shadow-lg transition-shadow duration-300 overflow-hidden text-left hover:-translate-y-2 transform'
+              className='border-4 border-gray-500 w-full h-full rounded-lg shadow-md hover:shadow-lg transition-shadow duration-300 overflow-hidden text-left hover:-translate-y-2 transform'
             >
               <div className='flex justify-center p-4'>
                 <img

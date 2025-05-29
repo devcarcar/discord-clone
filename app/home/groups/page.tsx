@@ -9,6 +9,7 @@ import GroupCard from '@/components/groupCard';
 import SearchModal from '@/components/modals/searchModal';
 import createGroupModal from '@/components/modals/createGroupModal';
 import { ModalType } from '@/helper';
+import Header from '@/components/header';
 
 type Group = {
   groupId: string;
@@ -29,10 +30,28 @@ export default function GroupPage() {
   const [searchQuery, setSearchQuery] = useState('');
   const [searchResults, setSearchResults] = useState<any[]>([]);
   const [isModalOpen, setIsModalOpen] = useState<false | ModalType>(false);
+  const [groupCreated, setgroupCreated] = useState<boolean>(false);
 
   const searchRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
 
+  const handleCreateGroup = async () => {
+    try {
+      const userRes = await axios.get('/api/users/getUser');
+      await axios.post('/api/groups', {
+        name: groupName,
+        user: userRes.data.data,
+        icon: pic,
+      });
+    } catch (error) {
+      console.error('Error creating group:', error);
+    } finally {
+      setPic('');
+      setGroupName('');
+      setIsModalOpen(false);
+      setgroupCreated(true);
+    }
+  };
   useEffect(() => {
     const fetchUserData = async () => {
       try {
@@ -46,7 +65,7 @@ export default function GroupPage() {
     };
 
     fetchUserData();
-  }, []);
+  }, [groupCreated]);
 
   useEffect(() => {
     const fetchGroupsData = async () => {
@@ -75,20 +94,6 @@ export default function GroupPage() {
 
     fetchGroupsData();
   }, [groups]);
-
-  const handleCreateGroup = async () => {
-    try {
-      const userRes = await axios.get('/api/users/getUser');
-      await axios.post('/api/groups', {
-        name: groupName,
-        user: userRes.data.data,
-      });
-    } catch (error) {
-      console.error('Error creating group:', error);
-    } finally {
-      setIsModalOpen(false);
-    }
-  };
 
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
@@ -119,23 +124,9 @@ export default function GroupPage() {
   }, [isModalOpen]);
 
   return (
-    <div className='flex'>
+    <div className='flex w-screen'>
       <div className='w-full bg-gray-900'>
-        <header className='border-b border-gray-700 p-4 flex justify-between items-center'>
-          <h1 className='text-xl font-semibold'>Groups</h1>
-          <div className='flex items-center gap-3'>
-            <button
-              onClick={() => setIsModalOpen(ModalType.SEARCH_MODAL)}
-              className='p-2 rounded-full hover:bg-gray-700 transition-colors'
-            >
-              <Search className='w-5 h-5 text-gray-400' />
-            </button>
-            <button className='p-2 rounded-full hover:bg-gray-700 transition-colors relative'>
-              <Bell className='w-5 h-5 text-gray-400' />
-              <span className='absolute top-1 right-1 w-2 h-2 bg-red-500 rounded-full'></span>
-            </button>
-          </div>
-        </header>
+        <Header setIsModalOpen={setIsModalOpen} title='Groups' />
 
         <div className='grid grid-cols-3 gap-[50px] p-[50px]'>
           <div className='group relative'>
@@ -172,6 +163,7 @@ export default function GroupPage() {
             groupName,
             setGroupName,
             handleCreateGroup,
+            setgroupCreated,
           })}
       </div>
     </div>

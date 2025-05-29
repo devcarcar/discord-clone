@@ -7,6 +7,7 @@ export default function createGroupModal({
   groupName,
   setGroupName,
   handleCreateGroup,
+  setgroupCreated,
 }: {
   searchRef: any;
   pic: any;
@@ -14,6 +15,7 @@ export default function createGroupModal({
   groupName: any;
   setGroupName: any;
   handleCreateGroup: any;
+  setgroupCreated: any;
 }) {
   return (
     <div className='fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-start justify-center pt-20'>
@@ -34,7 +36,6 @@ export default function createGroupModal({
           <UploadDropzone
             endpoint={'imageUploader'}
             onClientUploadComplete={(res) => {
-              console.log('Files: ', res);
               setPic(res[0].ufsUrl);
               alert('Upload Completed');
             }}

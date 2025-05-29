@@ -6,7 +6,7 @@ export default function GroupCard(group: any) {
     <div className='group relative' key={group.groupId}>
       <button
         onClick={() => redirect(`/home/groups/${group.groupId}`)}
-        className='border-4 border-white w-full h-full rounded-lg shadow-md hover:shadow-lg transition-shadow duration-300 overflow-hidden text-left hover:-translate-y-2 transform'
+        className='border-4 border-gray-500 w-full h-full rounded-lg shadow-md hover:shadow-lg transition-shadow duration-300 overflow-hidden text-left hover:-translate-y-2 transform'
       >
         <div className='flex justify-center p-4'>
           <img

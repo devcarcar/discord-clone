@@ -1,7 +1,9 @@
 'use client';
 import Navbar from '@/components/Navbar';
 import Header from '@/components/header';
+import SearchModal from '@/components/modals/searchModal';
 import SearchPage from '@/components/search';
+import { ModalType } from '@/helper';
 import axios from 'axios';
 import { Bell, Search, Sparkles, X } from 'lucide-react';
 import Link from 'next/link';
@@ -24,6 +26,8 @@ export default function Home() {
   ];
   const [isSearching, setIsSearching] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
+  const [isModalOpen, setIsModalOpen] = useState<false | ModalType>(false);
+  const [searchResults, setSearchResults] = useState<any[]>([]);
   const searchRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
 
@@ -34,12 +38,41 @@ export default function Home() {
     async function fetchBoth() {
       try {
         const res = await axios.get('/api/users/getUser');
-        setDms(res.data.data.dms);
-        setGroups(res.data.data.groups);
+        const { dms, groups } = res.data.data;
+        setDms(dms);
+        setGroups(groups);
+        setSearchResults([...dms, ...groups]);
       } catch (err: any) {}
     }
     fetchBoth();
   }, []);
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (
+        searchRef.current &&
+        !searchRef.current.contains(event.target as Node)
+      ) {
+        setIsModalOpen(false);
+      }
+    };
+
+    const handleKeyDown = (event: KeyboardEvent) => {
+      if (event.key === 'Escape') {
+        setIsModalOpen(false);
+      }
+    };
+
+    if (isModalOpen) {
+      document.addEventListener('mousedown', handleClickOutside);
+      document.addEventListener('keydown', handleKeyDown);
+      inputRef.current?.focus();
+    }
+
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+      document.removeEventListener('keydown', handleKeyDown);
+    };
+  }, [isModalOpen]);
 
   let listOfSearches: string[] = [];
   groups.forEach((g: any) => listOfSearches.push(g.name));
@@ -73,8 +106,9 @@ export default function Home() {
     };
   }, [isSearching]);
   return (
-    <div className='flex min-h-screen bg-gray-900 text-gray-100'>
+    <div className='flex min-h-screen w-screen bg-gray-900 text-gray-100'>
       <main className='flex-1 overflow-hidden'>
+        <Header setIsModalOpen={setIsModalOpen} title='Home' />
         <div className='p-6'>
           <div className='border h-[100px] border-gray-700 bg-transparent flex items-center p-6 rounded-lg'>
             <div className='p-3 rounded-full bg-blue-600/20'>
@@ -120,6 +154,15 @@ export default function Home() {
             ))}
           </div>
         </div>
+        {isModalOpen === ModalType.SEARCH_MODAL &&
+          SearchModal({
+            searchRef,
+            inputRef,
+            searchQuery,
+            setSearchQuery,
+            setIsModalOpen,
+            searchResults,
+          })}
       </main>
     </div>
   );
