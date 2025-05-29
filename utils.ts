@@ -1,10 +1,5 @@
 'use client';
 
-export enum ChannelType {
-  CATEGORY,
-  TEXT,
-  AUDIO,
-}
 import {
   generateUploadButton,
   generateUploadDropzone,

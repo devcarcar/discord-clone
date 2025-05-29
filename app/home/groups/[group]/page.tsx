@@ -3,9 +3,9 @@ import Navbar from '@/components/Navbar';
 import Header from '@/components/header';
 import SearchModal from '@/components/modals/searchModal';
 import { ModalType } from '@/helper';
-import { ChannelType } from '@/utils';
+import { ChannelType } from '@/helper';
 import axios from 'axios';
-import { Bell, ChevronDown, Hash, Mic, Search } from 'lucide-react';
+import { Bell, ChevronDown, Hash, Mic, Search, Settings } from 'lucide-react';
 import { useParams, useRouter } from 'next/navigation';
 import { useEffect, useRef, useState } from 'react';
 
@@ -20,7 +20,7 @@ export default function ExactGroup() {
   interface temp {
     channels: any[];
   }
-  const [groupObject, setGrpObj] = useState<temp>({ channels: [] });
+  const [groupObject, setGrpObj] = useState<any>({ channels: [] });
   const searchRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
 
@@ -130,6 +130,16 @@ export default function ExactGroup() {
         <Header setIsModalOpen={setIsModalOpen} title='Groups' />
         <div className='flex'>
           <div className='w-[220px] border-r h-screen text-gray-400 border-gray-700 bg-gray-800'>
+            <div className='p-3 flex justify-between border-b border-gray-700'>
+              <h2 className='text-sm font-semibold text-gray-400 uppercase tracking-wider'>
+                {groupObject.name || 'Group Channels'}
+              </h2>
+              <button
+                onClick={() => router.push(`/home/groups/${group}/settings`)}
+              >
+                <Settings className='text-gray-500 h-5 w-5' />
+              </button>
+            </div>
             {categories.map((cat) => (
               <div key={cat.channelId} className='mb-1'>
                 <button className='flex items-center gap-1 w-full px-2 py-1.5 hover:bg-gray-700/50 hover:text-gray-200 rounded-md transition-colors duration-150'>

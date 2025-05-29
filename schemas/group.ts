@@ -1,4 +1,3 @@
-import { ChannelType } from '@/utils';
 import { Schema, model, models } from 'mongoose';
 import { v4 as uuidv4 } from 'uuid';
 
@@ -9,7 +8,7 @@ const group = new Schema({
     default: () => uuidv4(),
     unique: true,
   },
-  name: { type: String, required: true, default: 'Brawl Stars' },
+  name: { type: String, required: true },
   description: {
     type: String,
     required: true,
@@ -18,8 +17,6 @@ const group = new Schema({
   icon: {
     type: String,
     required: true,
-    default:
-      'https://h7.alamy.com/comp/W3E09A/example-ribbon-example-isolated-sign-example-banner-W3E09A.jpg',
   },
   members: { type: Array, required: true, default: [] },
   activity: { type: Number, required: true, default: 256 },
@@ -33,15 +30,15 @@ const group = new Schema({
         name: 'general',
       },
       {
-        channelId: 'vc',
-        type: 2,
-        name: 'vc',
-        parent: 'general',
-      },
-      {
         channelId: 'chat',
         type: 1,
         name: 'chat',
+        parent: 'general',
+      },
+      {
+        channelId: 'vc',
+        type: 2,
+        name: 'vc',
         parent: 'general',
       },
     ],

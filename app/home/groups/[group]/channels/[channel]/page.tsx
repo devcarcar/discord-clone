@@ -1,11 +1,13 @@
 'use client';
 import Navbar from '@/components/Navbar';
 import Header from '@/components/header';
+import MemberProfileModal from '@/components/modals/memberProfileModal';
 import SearchModal from '@/components/modals/searchModal';
-import { ModalType } from '@/helper';
-import { ChannelType } from '@/utils';
+import { ModalType, ChannelType } from '@/helper';
+import User from '@/schemas/user';
+
 import axios from 'axios';
-import { Bell, ChevronDown, Hash, Mic, Search } from 'lucide-react';
+import { Bell, ChevronDown, Hash, Mic, Search, Settings } from 'lucide-react';
 import { useParams, useRouter } from 'next/navigation';
 import { useEffect, useMemo, useRef, useState } from 'react';
 
@@ -15,6 +17,7 @@ export default function ExactGroup() {
   const { group, channel } = params;
 
   // usestates
+  const [selectedMember, setSelectedMember] = useState<any>();
   const [groups, setGroups] = useState<any[]>([]);
   const [messages, setMessages] = useState<any[]>([]);
   const [searchResults, setSearchResults] = useState<any[]>([]);
@@ -27,6 +30,7 @@ export default function ExactGroup() {
   const [currentMsg, setcurrentMsg] = useState<string>('');
   const [isConnected, setIsConnected] = useState<boolean>(false);
   const [isfetchNeeded, setisfetchNeeded] = useState<boolean>(true);
+  const [arr, setArr] = useState<any[]>([]);
 
   //userefs
   const searchRef = useRef<HTMLDivElement>(null);
@@ -34,7 +38,7 @@ export default function ExactGroup() {
   const ws = useRef<any>(null);
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
-  // ws
+  //use effect
   useEffect(() => {
     const socket = new WebSocket('ws://localhost:3001');
 
@@ -88,7 +92,6 @@ export default function ExactGroup() {
     }
   };
 
-  // Auto-scroll to bottom when messages change
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
   }, [messages]);
@@ -189,6 +192,22 @@ export default function ExactGroup() {
     }
   }, [theActualChannel]);
 
+  useEffect(() => {
+    async function getAllMembers() {
+      let temp: any[] = [];
+      const res = await axios.get(`/api/groups/${group}`);
+      const exactGroup = res.data.data;
+      const res_2 = await axios.get('/api/users');
+      const allUsers = res_2.data;
+      exactGroup.members.forEach((m: string) => {
+        const found = allUsers.find((u: any) => u.userId === m);
+        if (found) temp.push(found);
+      });
+      setArr(temp);
+    }
+    getAllMembers();
+  }, []);
+
   const router = useRouter();
 
   if (isLoading)
@@ -205,12 +224,16 @@ export default function ExactGroup() {
       <div className='flex flex-col flex-1 overflow-hidden'>
         <Header setIsModalOpen={setIsModalOpen} title='Groups' />
         <div className='flex flex-1 overflow-hidden'>
-          {/* Channels sidebar */}
           <div className='w-60 border-r border-gray-700 bg-gray-800 flex flex-col'>
-            <div className='p-3 border-b border-gray-700'>
+            <div className='p-3 flex justify-between border-b border-gray-700'>
               <h2 className='text-sm font-semibold text-gray-400 uppercase tracking-wider'>
                 {groupObject.name || 'Group Channels'}
               </h2>
+              <button
+                onClick={() => router.push(`/home/groups/${group}/settings`)}
+              >
+                <Settings className='h-5 w-5 text-gray-500' />
+              </button>
             </div>
             <div className='flex-1 overflow-y-auto p-2 space-y-1'>
               {categories.map((cat) => (
@@ -266,7 +289,6 @@ export default function ExactGroup() {
             </div>
           </div>
 
-          {/* Main chat area */}
           <div className='flex-1 flex flex-col bg-gray-700/20'>
             {theActualChannel && (
               <div className='border-b border-gray-700 p-4 bg-gray-800/30'>
@@ -333,7 +355,6 @@ export default function ExactGroup() {
                 <div ref={messagesEndRef} />
               </div>
 
-              {/* Message input */}
               <div className='p-4 border-t border-gray-700 bg-gray-800/30'>
                 <div className='flex items-center gap-2'>
                   <input
@@ -373,17 +394,21 @@ export default function ExactGroup() {
               </h2>
             </div>
             <div className='flex-1 overflow-y-auto p-2'>
-              {groupObject.members?.length > 100 ? (
-                groupObject.members.map((member: any) => (
-                  <div
-                    key={member.id}
+              {arr.length > 0 ? (
+                arr.map((member: any) => (
+                  <button
+                    onClick={() => {
+                      setSelectedMember(member);
+                      setIsModalOpen(ModalType.MEMBER_PROFILE_MODAL);
+                    }}
+                    key={member.userId}
                     className='flex items-center gap-2 p-2 hover:bg-gray-700/50 rounded-md cursor-pointer transition-colors'
                   >
                     <div className='w-8 h-8 rounded-full bg-gray-600 flex items-center justify-center'>
                       {member.username.charAt(0).toUpperCase()}
                     </div>
                     <span className='text-sm'>{member.username}</span>
-                  </div>
+                  </button>
                 ))
               ) : (
                 <div className='p-4 text-center text-gray-400 text-sm'>
@@ -395,7 +420,7 @@ export default function ExactGroup() {
         </div>
       </div>
 
-      {isModalOpen && (
+      {isModalOpen === ModalType.SEARCH_MODAL && (
         <SearchModal
           inputRef={inputRef}
           searchRef={searchRef}
@@ -404,6 +429,9 @@ export default function ExactGroup() {
           setIsModalOpen={setIsModalOpen}
           searchResults={searchResults}
         />
+      )}
+      {isModalOpen === ModalType.MEMBER_PROFILE_MODAL && (
+        <MemberProfileModal searchRef={searchRef} member={selectedMember} />
       )}
     </div>
   );
