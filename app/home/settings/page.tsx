@@ -98,41 +98,36 @@ export default function SettingsPage() {
     return <div className='h-screen w-screen bg-gray-900'>Loading...</div>;
 
   return (
-    <div className='flex'>
-      <div>
-        <Navbar page={0} />
+    <div className='bg-gray-900 flex w-screen flex-col'>
+      <div className='h-16 bg-gray-800 flex-shrink-0'>
+        <SettingsHeader />
       </div>
-      <div className='bg-gray-900 flex w-screen flex-col'>
-        <div className='h-16 bg-gray-800 flex-shrink-0'>
-          <SettingsHeader />
-        </div>
 
-        <div className='flex-1 overflow-auto'>
-          <div className='p-6 flex flex-col md:flex-row gap-6 h-full'>
-            <div className='border border-gray-700 rounded-lg p-6 bg-gray-800/30 w-full md:max-w-xs h-fit'>
-              <div className='relative mx-auto w-24 h-24 mb-4 group'>
-                <img
-                  src='https://h7.alamy.com/comp/W3E09A/example-ribbon-example-isolated-sign-example-banner-W3E09A.jpg'
-                  className='w-full h-full rounded-full border-2 border-blue-500 object-cover'
-                  alt='Profile'
-                />
-                <button className='absolute inset-0 bg-black/50 rounded-full opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center'>
-                  <User className='w-5 h-5 text-white' />
-                </button>
-              </div>
-              <ProfileCard user={user} />
-            </div>
-
-            <div className='flex-1 space-y-6 pb-6'>
-              <AccountSettings
-                user={user}
-                setNew_un={setNew_un}
-                handleClick={handleClick}
+      <div className='flex-1 overflow-auto'>
+        <div className='p-6 flex flex-col md:flex-row gap-6 h-full'>
+          <div className='border border-gray-700 rounded-lg p-6 bg-gray-800/30 w-full md:max-w-xs h-fit'>
+            <div className='relative mx-auto w-24 h-24 mb-4 group'>
+              <img
+                src='https://h7.alamy.com/comp/W3E09A/example-ribbon-example-isolated-sign-example-banner-W3E09A.jpg'
+                className='w-full h-full rounded-full border-2 border-blue-500 object-cover'
+                alt='Profile'
               />
-              <PrivacySettings />
-              <NotificationSettings />
-              <DangerZone />
+              <button className='absolute inset-0 bg-black/50 rounded-full opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center'>
+                <User className='w-5 h-5 text-white' />
+              </button>
             </div>
+            <ProfileCard user={user} />
+          </div>
+
+          <div className='flex-1 space-y-6 pb-6'>
+            <AccountSettings
+              user={user}
+              setNew_un={setNew_un}
+              handleClick={handleClick}
+            />
+            <PrivacySettings />
+            <NotificationSettings />
+            <DangerZone />
           </div>
         </div>
       </div>

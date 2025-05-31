@@ -1,6 +1,6 @@
 'use client';
 import axios from 'axios';
-import { House, Settings, User, Users } from 'lucide-react';
+import { House, MessagesSquare, Settings, User, Users } from 'lucide-react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
@@ -29,7 +29,7 @@ const Navbar = ({ page }: { page: number }) => {
           href='/home'
           className='flex items-center justify-center p-3 mb-4 text-white rounded-lg hover:bg-gray-700/50 transition-colors'
         >
-          <House className='h-5 w-5' />
+          <MessagesSquare className='h-8 w-8' />
         </Link>
         <ul className='space-y-2 flex-1'>
           <li>

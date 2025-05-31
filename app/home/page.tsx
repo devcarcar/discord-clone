@@ -6,7 +6,6 @@ import SearchPage from '@/components/search';
 import { ModalType } from '@/helper';
 import axios from 'axios';
 import { Bell, Search, Sparkles, X } from 'lucide-react';
-import Link from 'next/link';
 import { useEffect, useRef, useState } from 'react';
 
 export default function Home() {
@@ -108,7 +107,6 @@ export default function Home() {
 
   return (
     <div className='flex h-screen w-screen'>
-      <Navbar page={0} />
       <div className='flex min-h-screen w-screen bg-gray-900 text-gray-100'>
         <div className='flex-1 overflow-hidden'>
           <Header setIsModalOpen={setIsModalOpen} title='Home' />
