@@ -11,7 +11,7 @@ const user = new Schema({
   },
   email: { type: String, required: true },
   password: { type: String, required: true },
-  createdAt: { type: Date, required: true },
+  createdAt: { type: Date, required: true, default: () => Date.now() },
   dms: {
     type: Array,
     required: true,

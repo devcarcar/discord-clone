@@ -1,13 +1,14 @@
 'use client';
 import Navbar from '@/components/Navbar';
 import Header from '@/components/header';
+import MemberProfileModal from '@/components/modals/memberProfileModal';
 import SearchModal from '@/components/modals/searchModal';
 import { ModalType } from '@/helper';
 import { ChannelType } from '@/helper';
 import axios from 'axios';
 import { Bell, ChevronDown, Hash, Mic, Search, Settings } from 'lucide-react';
 import { useParams, useRouter } from 'next/navigation';
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 
 export default function ExactGroup() {
   const params = useParams();
@@ -17,6 +18,13 @@ export default function ExactGroup() {
   const [searchQuery, setSearchQuery] = useState('');
   const [isLoading, setisLoading] = useState(true);
   const [isModalOpen, setIsModalOpen] = useState<false | ModalType>(false);
+  const [selectedMember, setSelectedMember] = useState<any>();
+  const [messages, setMessages] = useState<any[]>([]);
+  const [userInfo, setuserInfo] = useState<any>();
+  const [currentMsg, setcurrentMsg] = useState<string>('');
+  const [isConnected, setIsConnected] = useState<boolean>(false);
+  const [isfetchNeeded, setisfetchNeeded] = useState<boolean>(true);
+  const [arr, setArr] = useState<any[]>([]);
   interface temp {
     channels: any[];
   }
@@ -122,14 +130,30 @@ export default function ExactGroup() {
   const rootChannels = channels.filter(
     (c) => !c.parent && c.type != ChannelType.CATEGORY
   );
+
+  useEffect(() => {
+    async function getAllMembers() {
+      let temp: any[] = [];
+      const res = await axios.get(`/api/groups/${group}`);
+      const exactGroup = res.data.data;
+      const res_2 = await axios.get('/api/users');
+      const allUsers = res_2.data;
+      exactGroup.members.forEach((m: string) => {
+        const found = allUsers.find((u: any) => u.userId === m);
+        if (found) temp.push(found);
+      });
+      setArr(temp);
+    }
+    getAllMembers();
+  }, []);
+
   const router = useRouter();
-  if (isLoading) return <div>Loading</div>;
   return (
-    <div className='flex'>
-      <div className='w-screen bg-gray-900'>
+    <div className='flex w-screen h-screen bg-gray-900 text-gray-100'>
+      <div className='flex flex-col flex-1 overflow-hidden'>
         <Header setIsModalOpen={setIsModalOpen} title='Groups' />
-        <div className='flex'>
-          <div className='w-[220px] border-r h-screen text-gray-400 border-gray-700 bg-gray-800'>
+        <div className='flex flex-1 overflow-hidden'>
+          <div className='w-60 border-r border-gray-700 bg-gray-800 flex flex-col'>
             <div className='p-3 flex justify-between border-b border-gray-700'>
               <h2 className='text-sm font-semibold text-gray-400 uppercase tracking-wider'>
                 {groupObject.name || 'Group Channels'}
@@ -137,66 +161,106 @@ export default function ExactGroup() {
               <button
                 onClick={() => router.push(`/home/groups/${group}/settings`)}
               >
-                <Settings className='text-gray-500 h-5 w-5' />
+                <Settings className='h-5 w-5 text-gray-500' />
               </button>
             </div>
-            {categories.map((cat) => (
-              <div key={cat.channelId} className='mb-1'>
-                <button className='flex items-center gap-1 w-full px-2 py-1.5 hover:bg-gray-700/50 hover:text-gray-200 rounded-md transition-colors duration-150'>
-                  <ChevronDown className='h-4 w-4 text-gray-500' />
-                  <span className='text-sm font-medium'>{cat.name}</span>
-                </button>
-                {cat.channelList!.map((c: any) => (
-                  <button
-                    key={c.channelId}
-                    onClick={() =>
-                      router.push(
-                        `/home/groups/${group}/channels/${c.channelId}`
-                      )
-                    }
-                    className='flex items-center gap-2 w-full pl-6 pr-2 py-1.5 hover:bg-gray-700/30 hover:text-gray-200 rounded-md transition-colors duration-150'
-                  >
-                    {c.type === ChannelType.TEXT ? (
-                      <Hash className='h-4 w-4 text-gray-500' />
-                    ) : (
-                      <Mic className='h-4 w-4 text-gray-500' />
-                    )}
-                    <span className='text-sm'>{c.name}</span>
+            <div className='flex-1 overflow-y-auto p-2 space-y-1'>
+              {categories.map((cat) => (
+                <div key={cat.channelId} className='mb-2'>
+                  <button className='flex items-center gap-1 w-full px-2 py-1.5 hover:bg-gray-700/50 hover:text-gray-200 rounded-md transition-colors duration-150'>
+                    <ChevronDown className='h-4 w-4 text-gray-500' />
+                    <span className='text-sm font-medium'>{cat.name}</span>
                   </button>
-                ))}
-              </div>
-            ))}
-            {rootChannels.map((rc) => (
-              <button
-                key={rc.channelId}
-                onClick={() =>
-                  router.push(`/home/groups/${group}/channels/${rc.channelId}`)
-                }
-                className='flex items-center gap-2 w-full px-2 py-1.5 hover:bg-gray-700/30 hover:text-gray-200 rounded-md transition-colors duration-150'
-              >
-                {rc.type === ChannelType.TEXT ? (
-                  <Hash className='h-4 w-4 text-gray-500' />
-                ) : (
-                  <Mic className='h-4 w-4 text-gray-500' />
-                )}
-                <span className='text-sm'>{rc.name}</span>
-              </button>
-            ))}
+                  {cat.channelList!.map((c: any) => (
+                    <button
+                      key={c.channelId}
+                      onClick={() =>
+                        router.push(
+                          `/home/groups/${group}/channels/${c.channelId}`
+                        )
+                      }
+                      className={`flex items-center gap-2 w-full pl-6 pr-2 py-1.5 hover:bg-gray-700/30 hover:text-gray-200 rounded-md transition-colors duration-150 `}
+                    >
+                      {c.type === ChannelType.TEXT ? (
+                        <Hash className='h-4 w-4 text-gray-500' />
+                      ) : (
+                        <Mic className='h-4 w-4 text-gray-500' />
+                      )}
+                      <span className='text-sm'>{c.name}</span>
+                    </button>
+                  ))}
+                </div>
+              ))}
+              {rootChannels.map((rc) => (
+                <button
+                  key={rc.channelId}
+                  onClick={() =>
+                    router.push(
+                      `/home/groups/${group}/channels/${rc.channelId}`
+                    )
+                  }
+                  className={`flex items-center gap-2 w-full px-2 py-1.5 hover:bg-gray-700/30 hover:text-gray-200 rounded-md transition-colors duration-150`}
+                >
+                  {rc.type === ChannelType.TEXT ? (
+                    <Hash className='h-4 w-4 text-gray-500' />
+                  ) : (
+                    <Mic className='h-4 w-4 text-gray-500' />
+                  )}
+                  <span className='text-sm'>{rc.name}</span>
+                </button>
+              ))}
+            </div>
           </div>
-          <div className='flex items-center justify-center flex-grow'>
+
+          <div className='w-full flex-1 flex justify-center items-center'>
             Select a channel
+          </div>
+
+          <div className='w-60 border-l border-gray-700 bg-gray-800 flex flex-col'>
+            <div className='p-3 border-b border-gray-700'>
+              <h2 className='text-sm font-semibold text-gray-400 uppercase tracking-wider'>
+                Members
+              </h2>
+            </div>
+            <div className='flex-1 overflow-y-auto p-2'>
+              {arr.length > 0 ? (
+                arr.map((member: any) => (
+                  <button
+                    onClick={() => {
+                      setSelectedMember(member);
+                      setIsModalOpen(ModalType.MEMBER_PROFILE_MODAL);
+                    }}
+                    key={member.userId}
+                    className='flex items-center gap-2 p-2 hover:bg-gray-700/50 rounded-md cursor-pointer transition-colors'
+                  >
+                    <div className='w-8 h-8 rounded-full bg-gray-600 flex items-center justify-center'>
+                      {member.username.charAt(0).toUpperCase()}
+                    </div>
+                    <span className='text-sm'>{member.username}</span>
+                  </button>
+                ))
+              ) : (
+                <div className='p-4 text-center text-gray-400 text-sm'>
+                  No members found
+                </div>
+              )}
+            </div>
           </div>
         </div>
       </div>
+
       {isModalOpen === ModalType.SEARCH_MODAL && (
         <SearchModal
-          searchRef={searchRef}
           inputRef={inputRef}
+          searchRef={searchRef}
           searchQuery={searchQuery}
           setSearchQuery={setSearchQuery}
           setIsModalOpen={setIsModalOpen}
           searchResults={searchResults}
         />
+      )}
+      {isModalOpen === ModalType.MEMBER_PROFILE_MODAL && (
+        <MemberProfileModal searchRef={searchRef} member={selectedMember} />
       )}
     </div>
   );

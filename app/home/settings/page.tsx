@@ -3,6 +3,7 @@ import Navbar from '@/components/Navbar';
 import Header from '@/components/header';
 import AccountSettings from '@/components/settings/accountSettings';
 import DangerZone from '@/components/settings/dangerZone';
+import ExperimentalFeatures from '@/components/settings/experimentalFeatures';
 import SettingsHeader from '@/components/settings/header';
 import NotificationSettings from '@/components/settings/notificationSettings';
 import PrivacySettings from '@/components/settings/privacySettings';
@@ -127,6 +128,7 @@ export default function SettingsPage() {
             />
             <PrivacySettings />
             <NotificationSettings />
+            <ExperimentalFeatures />
             <DangerZone />
           </div>
         </div>

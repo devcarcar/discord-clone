@@ -209,16 +209,23 @@ export default function ExactGroup() {
   }, []);
 
   const router = useRouter();
-
-  if (isLoading)
-    return (
-      <div className='flex h-screen bg-gray-900'>
-        <div className='flex items-center justify-center flex-1'>
-          <div className='text-white'>Loading...</div>
-        </div>
+  const MemberItem = ({
+    member,
+    onClick,
+  }: {
+    member: any;
+    onClick: () => void;
+  }) => (
+    <button
+      onClick={onClick}
+      className='flex items-center gap-2 p-2 hover:bg-gray-700/50 rounded-md cursor-pointer transition-colors'
+    >
+      <div className='w-8 h-8 rounded-full bg-gray-600 flex items-center justify-center'>
+        {member.username.charAt(0).toUpperCase()}
       </div>
-    );
-
+      <span className='text-sm'>{member.username}</span>
+    </button>
+  );
   return (
     <div className='flex w-screen h-screen bg-gray-900 text-gray-100'>
       <div className='flex flex-col flex-1 overflow-hidden'>
@@ -305,7 +312,6 @@ export default function ExactGroup() {
                 </p>
               </div>
             )}
-
             <div className='flex-1 overflow-hidden flex flex-col'>
               <div className='flex-1 overflow-y-auto p-4 space-y-4'>
                 {!isConnected ? (
@@ -332,9 +338,16 @@ export default function ExactGroup() {
                       key={`${msg.timestamp}-${msg.sender.id}`}
                       className='flex gap-3 p-3 hover:bg-gray-800/30 rounded-lg transition-colors'
                     >
-                      <div className='flex-shrink-0 w-10 h-10 rounded-full bg-gray-600 flex items-center justify-center'>
-                        {msg.sender.username.charAt(0).toUpperCase()}
-                      </div>
+                      <button
+                        onClick={() => {
+                          setSelectedMember(msg.sender);
+                          setIsModalOpen(ModalType.MEMBER_PROFILE_MODAL);
+                        }}
+                      >
+                        <div className='flex-shrink-0 w-10 h-10 rounded-full bg-gray-600 flex items-center justify-center'>
+                          {msg.sender.username.charAt(0).toUpperCase()}
+                        </div>
+                      </button>
                       <div className='flex-1'>
                         <div className='flex items-baseline gap-2'>
                           <span className='font-medium text-blue-400'>
@@ -396,19 +409,14 @@ export default function ExactGroup() {
             <div className='flex-1 overflow-y-auto p-2'>
               {arr.length > 0 ? (
                 arr.map((member: any) => (
-                  <button
+                  <MemberItem
+                    key={member.userId}
+                    member={member}
                     onClick={() => {
                       setSelectedMember(member);
                       setIsModalOpen(ModalType.MEMBER_PROFILE_MODAL);
                     }}
-                    key={member.userId}
-                    className='flex items-center gap-2 p-2 hover:bg-gray-700/50 rounded-md cursor-pointer transition-colors'
-                  >
-                    <div className='w-8 h-8 rounded-full bg-gray-600 flex items-center justify-center'>
-                      {member.username.charAt(0).toUpperCase()}
-                    </div>
-                    <span className='text-sm'>{member.username}</span>
-                  </button>
+                  />
                 ))
               ) : (
                 <div className='p-4 text-center text-gray-400 text-sm'>
