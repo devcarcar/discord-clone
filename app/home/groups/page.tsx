@@ -22,6 +22,13 @@ type Group = {
 };
 
 export default function GroupPage() {
+  const [me, setMe] = useState<any>();
+  useEffect(() => {
+    async function GetUser() {
+      const res = await axios.get('/api/users/me');
+      setMe(res.data);
+    }
+  }, []);
   const [pic, setPic] = useState<string>();
   const [groups, setGroups] = useState<string[]>([]);
   const [groupData, setGroupData] = useState<Group[]>([]);
@@ -38,7 +45,7 @@ export default function GroupPage() {
 
   const handleCreateGroup = async () => {
     try {
-      const userRes = await axios.get('/api/users/getUser');
+      const userRes = await axios.get('/api/users/me');
       await axios.post('/api/groups', {
         name: groupName,
         user: userRes.data.data,
@@ -56,7 +63,7 @@ export default function GroupPage() {
   useEffect(() => {
     const fetchUserData = async () => {
       try {
-        const res = await axios.get('/api/users/getUser');
+        const res = await axios.get('/api/users/me');
         const { dms, groups } = res.data.data;
         setGroups(groups);
         setSearchResults([...dms, ...groups]);

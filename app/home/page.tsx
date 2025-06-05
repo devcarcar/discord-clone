@@ -36,7 +36,7 @@ export default function Home() {
   useEffect(() => {
     async function fetchBoth() {
       try {
-        const res = await axios.get('/api/users/getUser');
+        const res = await axios.get('/api/users/me');
         const { dms, groups } = res.data.data;
         setDms(dms);
         setGroups(groups);

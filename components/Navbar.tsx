@@ -11,7 +11,7 @@ const Navbar = ({ page }: { page: number }) => {
   useEffect(() => {
     async function getUser() {
       try {
-        const res = await axios.get('/api/users/getUser');
+        const res = await axios.get('/api/users/me');
         setUser(res.data.data);
       } catch (e: any) {
         throw new Error('Some fetching problems', e);

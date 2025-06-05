@@ -147,7 +147,7 @@ export default function ExactGroup() {
   useEffect(() => {
     async function getUser() {
       try {
-        const res = await axios.get(`/api/users/getUser`);
+        const res = await axios.get(`/api/users/me`);
         const { data } = res.data;
         const { groups, dms } = data;
         setuserInfo(data);
@@ -226,6 +226,7 @@ export default function ExactGroup() {
       <span className='text-sm'>{member.username}</span>
     </button>
   );
+
   return (
     <div className='flex w-screen h-screen bg-gray-900 text-gray-100'>
       <div className='flex flex-col flex-1 overflow-hidden'>
@@ -439,7 +440,11 @@ export default function ExactGroup() {
         />
       )}
       {isModalOpen === ModalType.MEMBER_PROFILE_MODAL && (
-        <MemberProfileModal searchRef={searchRef} member={selectedMember} />
+        <MemberProfileModal
+          currentUser={userInfo}
+          searchRef={searchRef}
+          member={selectedMember}
+        />
       )}
     </div>
   );

@@ -1,5 +1,7 @@
 'use client';
+import axios from 'axios';
 import { redirect } from 'next/navigation';
+import { useEffect, useState } from 'react';
 
 interface Dm {
   id: string;
@@ -9,10 +11,13 @@ interface Dm {
   active: boolean;
 }
 
-enum Status {
+export enum Status {
   ONLINE = 'ONLINE',
   DND = 'DND',
   OFFLINE = 'OFFLINE',
+}
+export enum ParseStatus {
+  ONLINE,
 }
 const arr: Dm[] = [
   {
@@ -58,20 +63,20 @@ enum StatusIcon {
   OFFLINE = '⚪',
 }
 
-export default function DmsList({ arr }: { arr: Dm[] }) {
+export default function DmsList({ arr }: { arr: any[] }) {
   return (
     <div className='grid grid-cols-5 gap-[75px] p-[75px]'>
       {arr.map((i) => {
         return (
-          <div className='group relative' key={i.id}>
+          <div className='group relative' key={i.dmId}>
             <button
-              onClick={() => redirect(`/home/dms/${i.id}`)}
+              onClick={() => redirect(`/home/dms/${i.dmId}`)}
               className='border-4 border-gray-500 w-full h-full rounded-lg shadow-md hover:shadow-lg transition-shadow duration-300 overflow-hidden text-left hover:-translate-y-2 transform'
             >
               <div className='flex justify-center p-4'>
                 <img
-                  src={i.icon}
-                  alt={`${i.name} icon`}
+                  src={i.dmId}
+                  alt={`${i.dmId} icon`}
                   className='w-16 h-16 object-cover rounded-full border-2 border-gray-200 dark:border-gray-600'
                 />
               </div>
@@ -81,7 +86,7 @@ export default function DmsList({ arr }: { arr: Dm[] }) {
                 </h2>
 
                 <div className='flex justify-between text-xs text-gray-500 dark:text-gray-400 mt-4'>
-                  <span>{StatusIcon[i.status] + ' ' + i.status}</span>
+                  <span>{i.status + ' ' + i.status}</span>
                   {i.active && <span>🔥 active</span>}
                 </div>
               </div>

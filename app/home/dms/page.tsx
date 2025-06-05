@@ -9,6 +9,7 @@ import { useEffect, useRef, useState } from 'react';
 
 export default function DmsPage() {
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [isLoading, setIsLoading] = useState();
   const [searchQuery, setSearchQuery] = useState('');
   const searchRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
@@ -20,9 +21,8 @@ export default function DmsPage() {
   useEffect(() => {
     async function fetchBoth() {
       try {
-        const res = await axios.get('/api/users/getUser');
+        const res = await axios.get('/api/users/me');
         const { dms, groups } = res.data.data;
-        setDms(dms);
         setGroups(groups);
         setSearchResults([...dms, ...groups]);
       } catch (err: any) {}
@@ -64,8 +64,13 @@ export default function DmsPage() {
   useEffect(() => {
     async function fetchDms() {
       try {
-        const res = await axios.get('/api/users/getUser');
-        setDms(res.data.data.dms);
+        const res = await axios.get('/api/users/me');
+        const allDms = res.data.data.dms;
+        const res2 = await axios.get('/api/dms');
+        res2.data.forEach((i: any) => {
+          if (allDms.find((j: string) => j === i.dmId))
+            setDms((prev: any) => [...prev, i]);
+        });
       } catch (err: any) {}
     }
     fetchDms();

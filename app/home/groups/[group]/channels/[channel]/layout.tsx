@@ -87,7 +87,7 @@ export default function GroupLayout({
   // useEffect(() => {
   //   async function getUser() {
   //     try {
-  //       const res = await axios.get(`/api/users/getUser`);
+  //       const res = await axios.get(`/api/users/me`);
   //       const { data } = res.data;
   //       const { groups, dms } = data;
   //       setuserInfo(data);

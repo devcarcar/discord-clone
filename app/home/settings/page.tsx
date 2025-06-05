@@ -1,4 +1,5 @@
 'use client';
+import { UserPatchType } from '@/app/api/users/[userId]/route';
 import Navbar from '@/components/Navbar';
 import Header from '@/components/header';
 import AccountSettings from '@/components/settings/accountSettings';
@@ -40,7 +41,7 @@ export default function SettingsPage() {
   useEffect(() => {
     async function fetchUser() {
       try {
-        const res = await axios.get('/api/users/getUser');
+        const res = await axios.get('/api/users/me');
         setUser(res.data.data);
       } catch (err: any) {
         throw new Error('Some fetching problems', err);
@@ -80,9 +81,10 @@ export default function SettingsPage() {
   useEffect(() => {
     async function changeUsername() {
       try {
-        const res = await axios.patch('/api/users/changeUser', {
-          userId: user.userId,
-          new_un: new_un,
+        const res = await axios.patch(`/api/users/${user.userId}`, {
+          type: UserPatchType.USERNAME,
+          method: 'set',
+          newValue: new_un,
         });
         console.log(res);
       } catch (e: any) {

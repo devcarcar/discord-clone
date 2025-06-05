@@ -37,7 +37,7 @@ export default function ExactGroup() {
   useEffect(() => {
     async function fetchBoth() {
       try {
-        const res = await axios.get('/api/users/getUser');
+        const res = await axios.get('/api/users/me');
         setDms(res.data.data.dms);
         setGroups(res.data.data.groups);
       } catch (err: any) {}
@@ -78,7 +78,7 @@ export default function ExactGroup() {
   useEffect(() => {
     async function fetchGroups() {
       try {
-        const res = await axios.get('/api/users/getUser');
+        const res = await axios.get('/api/users/me');
         setGroups(res.data.data.groups);
       } catch (err: any) {}
     }
@@ -88,7 +88,7 @@ export default function ExactGroup() {
   useEffect(() => {
     const fetchUserData = async () => {
       try {
-        const res = await axios.get('/api/users/getUser');
+        const res = await axios.get('/api/users/me');
         const { dms, groups } = res.data.data;
         setGroups(groups);
         setSearchResults([...dms, ...groups]);
@@ -260,7 +260,11 @@ export default function ExactGroup() {
         />
       )}
       {isModalOpen === ModalType.MEMBER_PROFILE_MODAL && (
-        <MemberProfileModal searchRef={searchRef} member={selectedMember} />
+        <MemberProfileModal
+          currentUser={userInfo}
+          searchRef={searchRef}
+          member={selectedMember}
+        />
       )}
     </div>
   );
