@@ -5,11 +5,11 @@ import { useEffect } from 'react';
 import axios from 'axios';
 
 export default function MemberProfileModal({
-  currentUser,
+  me,
   searchRef,
   member,
 }: {
-  currentUser: any;
+  me: any;
   searchRef: any;
   member: any;
 }) {
@@ -19,7 +19,7 @@ export default function MemberProfileModal({
       user2: u2,
     });
   }
-  const searcher = [...currentUser.dms, ...member.dms];
+  const searcher = [...me.dms, ...member.dms];
   function findThatElement(searcher: any[]) {
     const arr: any[] = [];
     let found = null;
@@ -101,7 +101,7 @@ export default function MemberProfileModal({
             Message
           </button>
           <button
-            onClick={() => makeNewDm(currentUser.userId, member.userId)}
+            onClick={() => makeNewDm(me.userId, member.userId)}
             className='py-2 px-4 bg-blue-600 hover:bg-blue-700 rounded-md transition-colors'
           >
             <UserPlus />

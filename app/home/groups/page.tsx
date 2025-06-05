@@ -28,6 +28,7 @@ export default function GroupPage() {
       const res = await axios.get('/api/users/me');
       setMe(res.data);
     }
+    GetUser();
   }, []);
   const [pic, setPic] = useState<string>();
   const [groups, setGroups] = useState<string[]>([]);
@@ -45,10 +46,9 @@ export default function GroupPage() {
 
   const handleCreateGroup = async () => {
     try {
-      const userRes = await axios.get('/api/users/me');
       await axios.post('/api/groups', {
         name: groupName,
-        user: userRes.data.data,
+        user: me,
         icon: pic,
       });
     } catch (error) {

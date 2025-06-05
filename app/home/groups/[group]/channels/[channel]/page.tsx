@@ -12,33 +12,37 @@ import { useParams, useRouter } from 'next/navigation';
 import { useEffect, useMemo, useRef, useState } from 'react';
 
 export default function ExactGroup() {
-  // params
   const params = useParams();
   const { group, channel } = params;
 
-  // usestates
+  const [me, setMe] = useState<any>();
   const [selectedMember, setSelectedMember] = useState<any>();
-  const [groups, setGroups] = useState<any[]>([]);
+
   const [messages, setMessages] = useState<any[]>([]);
   const [searchResults, setSearchResults] = useState<any[]>([]);
   const [isModalOpen, setIsModalOpen] = useState<false | ModalType>(false);
   const [searchQuery, setSearchQuery] = useState('');
-  const [isLoading, setisLoading] = useState(true);
   const [groupObject, setGrpObj] = useState<any>({ channels: [] });
-  const [dms, setDms] = useState<any[]>([]);
-  const [userInfo, setuserInfo] = useState<any>();
   const [currentMsg, setcurrentMsg] = useState<string>('');
   const [isConnected, setIsConnected] = useState<boolean>(false);
-  const [isfetchNeeded, setisfetchNeeded] = useState<boolean>(true);
   const [arr, setArr] = useState<any[]>([]);
 
-  //userefs
   const searchRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
   const ws = useRef<any>(null);
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
-  //use effect
+  //me
+  useEffect(() => {
+    async function getMe() {
+      const res = await axios.get('/api/users/me');
+      setMe(res.data);
+      setSearchResults([...me.dms, ...me.groups]);
+    }
+    getMe();
+  }, []);
+
+  //ws
   useEffect(() => {
     const socket = new WebSocket('ws://localhost:3001');
 
@@ -96,11 +100,6 @@ export default function ExactGroup() {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
   }, [messages]);
 
-  //random
-  let listOfSearches: string[] = [];
-  groups.forEach((g: any) => listOfSearches.push(g.name));
-  dms.forEach((d: any) => listOfSearches.push(d.name));
-
   //useeffects
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
@@ -138,30 +137,10 @@ export default function ExactGroup() {
       } catch (e: any) {
         throw new Error('Internal Error');
       } finally {
-        setisLoading(false);
       }
     }
     fetchThatGroup();
   }, [group]);
-
-  useEffect(() => {
-    async function getUser() {
-      try {
-        const res = await axios.get(`/api/users/me`);
-        const { data } = res.data;
-        const { groups, dms } = data;
-        setuserInfo(data);
-        setGroups(groups);
-        setDms(dms);
-        setSearchResults([...dms, ...groups]);
-      } catch (e: any) {
-        throw new Error('Internal Error');
-      } finally {
-        setisLoading(false);
-      }
-    }
-    if (isfetchNeeded) getUser();
-  }, [isfetchNeeded]);
 
   const channels: any[] = groupObject.channels;
   const categories = channels.filter((c) => c.type === ChannelType.CATEGORY);
@@ -383,15 +362,13 @@ export default function ExactGroup() {
                         currentMsg.trim() &&
                         isConnected
                       ) {
-                        sendMessage(currentMsg, Date.now(), userInfo);
+                        sendMessage(currentMsg, Date.now(), me);
                       }
                     }}
                   />
                   <button
                     className='px-4 py-3 bg-blue-600 hover:bg-blue-700 rounded-lg disabled:opacity-50 disabled:cursor-not-allowed transition-colors'
-                    onClick={() =>
-                      sendMessage(currentMsg, Date.now(), userInfo)
-                    }
+                    onClick={() => sendMessage(currentMsg, Date.now(), me)}
                     disabled={!currentMsg.trim() || !isConnected}
                   >
                     Send
@@ -441,7 +418,7 @@ export default function ExactGroup() {
       )}
       {isModalOpen === ModalType.MEMBER_PROFILE_MODAL && (
         <MemberProfileModal
-          currentUser={userInfo}
+          me={me}
           searchRef={searchRef}
           member={selectedMember}
         />

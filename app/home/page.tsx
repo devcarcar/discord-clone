@@ -2,7 +2,6 @@
 import Navbar from '@/components/Navbar';
 import Header from '@/components/header';
 import SearchModal from '@/components/modals/searchModal';
-import SearchPage from '@/components/search';
 import { ModalType } from '@/helper';
 import axios from 'axios';
 import { Bell, Search, Sparkles, X } from 'lucide-react';
@@ -72,10 +71,6 @@ export default function Home() {
       document.removeEventListener('keydown', handleKeyDown);
     };
   }, [isModalOpen]);
-
-  let listOfSearches: string[] = [];
-  groups.forEach((g: any) => listOfSearches.push(g.name));
-  dms.forEach((d: any) => listOfSearches.push(d.name));
 
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {

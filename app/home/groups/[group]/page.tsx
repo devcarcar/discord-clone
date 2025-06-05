@@ -20,7 +20,7 @@ export default function ExactGroup() {
   const [isModalOpen, setIsModalOpen] = useState<false | ModalType>(false);
   const [selectedMember, setSelectedMember] = useState<any>();
   const [messages, setMessages] = useState<any[]>([]);
-  const [userInfo, setuserInfo] = useState<any>();
+  const [me, setMe] = useState<any>();
   const [currentMsg, setcurrentMsg] = useState<string>('');
   const [isConnected, setIsConnected] = useState<boolean>(false);
   const [isfetchNeeded, setisfetchNeeded] = useState<boolean>(true);
@@ -38,16 +38,15 @@ export default function ExactGroup() {
     async function fetchBoth() {
       try {
         const res = await axios.get('/api/users/me');
-        setDms(res.data.data.dms);
-        setGroups(res.data.data.groups);
+        setMe(res.data);
+        setGroups(me.groups);
+        setDms(me.dms);
+        setSearchResults([...dms, ...groups]);
       } catch (err: any) {}
     }
     fetchBoth();
   }, []);
 
-  let listOfSearches: string[] = [];
-  groups.forEach((g: any) => listOfSearches.push(g.name));
-  dms.forEach((d: any) => listOfSearches.push(d.name));
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
       if (
@@ -75,30 +74,7 @@ export default function ExactGroup() {
       document.removeEventListener('keydown', handleKeyDown);
     };
   }, [isModalOpen]);
-  useEffect(() => {
-    async function fetchGroups() {
-      try {
-        const res = await axios.get('/api/users/me');
-        setGroups(res.data.data.groups);
-      } catch (err: any) {}
-    }
-    fetchGroups();
-  }, []);
 
-  useEffect(() => {
-    const fetchUserData = async () => {
-      try {
-        const res = await axios.get('/api/users/me');
-        const { dms, groups } = res.data.data;
-        setGroups(groups);
-        setSearchResults([...dms, ...groups]);
-      } catch (error) {
-        console.error('Error fetching user data:', error);
-      }
-    };
-
-    fetchUserData();
-  }, []);
   useEffect(() => {
     async function fetchThatGroup() {
       try {
@@ -136,8 +112,7 @@ export default function ExactGroup() {
       let temp: any[] = [];
       const res = await axios.get(`/api/groups/${group}`);
       const exactGroup = res.data.data;
-      const res_2 = await axios.get('/api/users');
-      const allUsers = res_2.data;
+      const allUsers = (await axios.get('/api/users')).data;
       exactGroup.members.forEach((m: string) => {
         const found = allUsers.find((u: any) => u.userId === m);
         if (found) temp.push(found);
@@ -261,7 +236,7 @@ export default function ExactGroup() {
       )}
       {isModalOpen === ModalType.MEMBER_PROFILE_MODAL && (
         <MemberProfileModal
-          currentUser={userInfo}
+          me={me}
           searchRef={searchRef}
           member={selectedMember}
         />
