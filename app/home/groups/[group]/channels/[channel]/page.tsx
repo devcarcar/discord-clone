@@ -26,6 +26,7 @@ export default function ExactGroup() {
   const [currentMsg, setcurrentMsg] = useState<string>('');
   const [isConnected, setIsConnected] = useState<boolean>(false);
   const [arr, setArr] = useState<any[]>([]);
+  const [isLoading, setisLoading] = useState(true);
 
   const searchRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
@@ -36,8 +37,9 @@ export default function ExactGroup() {
   useEffect(() => {
     async function getMe() {
       const res = await axios.get('/api/users/me');
+      const { dms, groups } = res.data;
       setMe(res.data);
-      setSearchResults([...me.dms, ...me.groups]);
+      setSearchResults([...dms, ...groups]);
     }
     getMe();
   }, []);

@@ -16,21 +16,13 @@ export default function DmsPage() {
   const [searchResults, setSearchResults] = useState<any[]>([]);
 
   const [dms, setDms]: any[] = useState([]);
-  const [groups, setGroups]: any[] = useState([]);
 
-  useEffect(() => {
-    async function getMe() {
-      const res = await axios.get('/api/users/me');
-      setMe(res.data.data);
-    }
-    getMe();
-  }, []);
   useEffect(() => {
     async function fetchBoth() {
       try {
         const res = await axios.get('/api/users/me');
+        setMe(res.data.data);
         const { dms, groups } = res.data.data;
-        setGroups(groups);
         setSearchResults([...dms, ...groups]);
       } catch (err: any) {}
     }
