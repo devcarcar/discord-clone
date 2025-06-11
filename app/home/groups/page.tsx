@@ -11,6 +11,7 @@ import createGroupModal from '@/components/modals/createGroupModal';
 import { ModalType } from '@/helper';
 import Header from '@/components/header';
 import RootLayout from '../layout';
+import CreateModal from '@/components/modals/createModal';
 
 type Group = {
   groupId: string;
@@ -23,91 +24,53 @@ type Group = {
 
 export default function GroupPage() {
   const [me, setMe] = useState<any>();
-  useEffect(() => {
-    async function GetUser() {
-      const res = await axios.get('/api/users/me');
-      setMe(res.data);
-    }
-    GetUser();
-  }, []);
+
   const [pic, setPic] = useState<string>();
-  const [groups, setGroups] = useState<string[]>([]);
   const [groupData, setGroupData] = useState<Group[]>([]);
   const [isLoading, setIsLoading] = useState(true);
-
+  const [mode, setMode] = useState<number>(0);
   const [groupName, setGroupName] = useState('');
   const [searchQuery, setSearchQuery] = useState('');
   const [searchResults, setSearchResults] = useState<any[]>([]);
   const [isModalOpen, setIsModalOpen] = useState<false | ModalType>(false);
   const [groupCreated, setgroupCreated] = useState<boolean>(false);
 
-  const searchRef = useRef<HTMLDivElement>(null);
+  const modalRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
-
-  const handleCreateGroup = async () => {
-    try {
-      await axios.post('/api/groups', {
-        name: groupName,
-        user: me,
-        icon: pic,
-      });
-    } catch (error) {
-      console.error('Error creating group:', error);
-    } finally {
-      setPic('');
-      setGroupName('');
-      setIsModalOpen(false);
-      setgroupCreated(true);
-    }
+  const router = useRouter();
+  const onSuccess = (groupId: string) => {
+    router.push(`/home/groups/${groupId}`);
   };
   useEffect(() => {
-    const fetchUserData = async () => {
-      try {
-        const res = await axios.get('/api/users/me');
-        const { dms, groups } = res.data.data;
-        setGroups(groups);
-        setSearchResults([...dms, ...groups]);
-      } catch (error) {
-        console.error('Error fetching user data:', error);
-      }
-    };
-
-    fetchUserData();
-  }, [groupCreated]);
-
-  useEffect(() => {
-    const fetchGroupsData = async () => {
-      if (groups.length === 0) {
-        setIsLoading(false);
-        return;
-      }
-
+    async function fetchUserAndGroups() {
       setIsLoading(true);
-      const fetchedGroups: Group[] = [];
+      try {
+        const userRes = await axios.get('/api/users/me');
+        setMe(userRes.data.data);
 
-      for (const groupId of groups) {
-        try {
-          const res = await axios.get(`/api/groups/${groupId}`);
-          if (res.data.data) {
-            fetchedGroups.push(res.data.data);
-          }
-        } catch (error) {
-          console.error(`Error fetching group ${groupId}:`, error);
+        const fetchedGroups: Group[] = [];
+
+        for (const group of userRes.data.data.groups) {
+          const res = await axios.get(`/api/groups/${group}`);
+          fetchedGroups.push(res.data.data);
         }
+
+        setGroupData(fetchedGroups);
+      } catch (error) {
+        console.error('Error fetching data:', error);
+      } finally {
+        setIsLoading(false);
       }
+    }
 
-      setGroupData(fetchedGroups);
-      setIsLoading(false);
-    };
-
-    fetchGroupsData();
-  }, [groups]);
+    fetchUserAndGroups();
+  }, [groupCreated]);
 
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
       if (
-        searchRef.current &&
-        !searchRef.current.contains(event.target as Node)
+        modalRef.current &&
+        !modalRef.current.contains(event.target as Node)
       ) {
         setIsModalOpen(false);
       }
@@ -137,15 +100,6 @@ export default function GroupPage() {
         <Header setIsModalOpen={setIsModalOpen} title='Groups' />
 
         <div className='grid grid-cols-3 gap-[50px] p-[50px]'>
-          <div className='group relative'>
-            <button
-              onClick={() => setIsModalOpen(ModalType.CREATE_GROUP_MODAL)}
-              className='border-4 border-dashed border-gray-500 w-full h-full rounded-lg hover:border-gray-400 transition-colors duration-300 p-8 text-gray-400 hover:text-white'
-            >
-              + Create new group
-            </button>
-          </div>
-
           {isLoading ? (
             <div className='col-span-2 flex items-center justify-center'>
               Loading groups...
@@ -156,22 +110,26 @@ export default function GroupPage() {
         </div>
         {isModalOpen === ModalType.SEARCH_MODAL &&
           SearchModal({
-            searchRef,
+            modalRef,
             inputRef,
             searchQuery,
             setSearchQuery,
             setIsModalOpen,
             searchResults,
           })}
-        {isModalOpen === ModalType.CREATE_GROUP_MODAL &&
-          createGroupModal({
-            searchRef,
-            pic,
-            setPic,
+
+        {isModalOpen === ModalType.CREATE_MODAL &&
+          CreateModal({
+            me,
+            modalRef,
+            setIsModalOpen,
             groupName,
             setGroupName,
-            handleCreateGroup,
-            setgroupCreated,
+            mode,
+            setMode,
+            pic,
+            setPic,
+            onSuccess,
           })}
       </div>
     </div>

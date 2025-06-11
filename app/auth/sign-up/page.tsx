@@ -1,17 +1,19 @@
 'use client';
 import axios from 'axios';
 import { Check, Circle } from 'lucide-react';
-import { redirect } from 'next/navigation';
+import { redirect, useRouter } from 'next/navigation';
 import { useState } from 'react';
 
 export default function Auth() {
+  const router = useRouter();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
 
   async function validate() {
     try {
       const response = await axios.post('/api/users', { email, password });
-      console.log(response);
+      await axios.post('/api/auth/signup', { email, password });
+      router.push('/home');
     } catch (e) {}
   }
 
@@ -40,55 +42,8 @@ export default function Auth() {
             value={password}
           />
         </div>
-        <div className='flex items-center text-[10px] text-black'>
-          {password.length >= 9 ? (
-            <Check color='#008000' size={9} />
-          ) : (
-            <Circle size={9} />
-          )}
-          {password.length >= 9 ? (
-            <span>Contains at least 9 characters</span>
-          ) : (
-            <span>{password.length}/9 characters needed</span>
-          )}
-        </div>
-        <div className='flex items-center text-[10px] text-black'>
-          {password.match(/[!@#$%^&*]/) ? (
-            <Check color='#008000' size={9} />
-          ) : (
-            <Circle size={9} />
-          )}
-          {password.match(/[!@#$%^&*]/) ? (
-            <span>Contains at least 1 symbol</span>
-          ) : (
-            <span>0/1 symbol needed</span>
-          )}
-        </div>
-        <div className='flex items-center text-[10px] text-black'>
-          {password.match(/[A-Z]/) ? (
-            <Check color='#008000' size={9} />
-          ) : (
-            <Circle size={9} />
-          )}
-          {password.match(/[A-Z]/) ? (
-            <span>Contains at least 1 uppercase letter</span>
-          ) : (
-            <span>0/1 uppercase letter needed</span>
-          )}
-        </div>
-        <div className='flex items-center text-[10px] text-black'>
-          {password.match(/[a-z]/) ? (
-            <Check color='#008000' size={9} />
-          ) : (
-            <Circle size={9} />
-          )}
-          {password.match(/[a-z]/) ? (
-            <span>Contains at least 1 lowercase letter</span>
-          ) : (
-            <span>0/1 lowercase letter needed</span>
-          )}
-        </div>
-        {!password.match('^(?=.*[a-z])(?=.*[A-Z])(?=.*[!@#$%^&*]).{9,}$') && (
+
+        {password.length < 8 && (
           <p className='text-red-500 text-sm mt-2'>
             Error! Password is too weak
           </p>
@@ -102,13 +57,9 @@ export default function Auth() {
 
       <button
         onClick={validate}
-        disabled={
-          !email ||
-          !password.match('^(?=.*[a-z])(?=.*[A-Z])(?=.*[!@#$%^&*]).{9,15}$')
-        }
+        disabled={!email || password.length < 8 || password.length > 15}
         className={`w-full py-2 rounded-lg shadow-md transition-colors ${
-          !email ||
-          !password.match('^(?=.*[a-z])(?=.*[A-Z])(?=.*[!@#$%^&*]).{9,15}$')
+          !email || password.length < 8 || password.length > 15
             ? 'bg-gray-400 cursor-not-allowed'
             : 'bg-blue-500 hover:bg-blue-600'
         }`}

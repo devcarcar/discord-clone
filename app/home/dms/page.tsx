@@ -2,21 +2,29 @@
 import Navbar from '@/components/Navbar';
 import DmsList from '@/components/dms';
 import Header from '@/components/header';
+import CreateModal from '@/components/modals/createModal';
 import SearchModal from '@/components/modals/searchModal';
+import { ModalType } from '@/helper';
 import axios from 'axios';
+import { useRouter } from 'next/navigation';
 import { useEffect, useRef, useState } from 'react';
 
 export default function DmsPage() {
   const [me, setMe] = useState<any>();
-  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [groupName, setGroupName] = useState();
+  const [pic, setPic] = useState();
+  const [isModalOpen, setIsModalOpen] = useState<any>(false);
   const [isLoading, setIsLoading] = useState();
   const [searchQuery, setSearchQuery] = useState('');
-  const searchRef = useRef<HTMLDivElement>(null);
+  const modalRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
   const [searchResults, setSearchResults] = useState<any[]>([]);
-
+  const [mode, setMode] = useState(0);
   const [dms, setDms]: any[] = useState([]);
-
+  const router = useRouter();
+  const onSuccess = (groupId: string) => {
+    router.push(`/home/groups/${groupId}`);
+  };
   useEffect(() => {
     async function fetchBoth() {
       try {
@@ -32,8 +40,8 @@ export default function DmsPage() {
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
       if (
-        searchRef.current &&
-        !searchRef.current.contains(event.target as Node)
+        modalRef.current &&
+        !modalRef.current.contains(event.target as Node)
       ) {
         setIsModalOpen(false);
       }
@@ -74,14 +82,27 @@ export default function DmsPage() {
         <Header title='Direct Messages' setIsModalOpen={setIsModalOpen} />
         <DmsList arr={dms} />
       </div>
-      {isModalOpen &&
+      {isModalOpen === ModalType.SEARCH_MODAL &&
         SearchModal({
-          searchRef,
+          modalRef,
           inputRef,
           searchQuery,
           setSearchQuery,
           setIsModalOpen,
           searchResults,
+        })}
+      {isModalOpen === ModalType.CREATE_MODAL &&
+        CreateModal({
+          me,
+          modalRef,
+          setIsModalOpen,
+          groupName,
+          setGroupName,
+          mode,
+          setMode,
+          pic,
+          setPic,
+          onSuccess,
         })}
     </div>
   );

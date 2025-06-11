@@ -6,11 +6,11 @@ import axios from 'axios';
 
 export default function MemberProfileModal({
   me,
-  searchRef,
+  modalRef,
   member,
 }: {
   me: any;
-  searchRef: any;
+  modalRef: any;
   member: any;
 }) {
   async function makeNewDm(u1: string, u2: string) {
@@ -37,7 +37,7 @@ export default function MemberProfileModal({
   return (
     <div className='fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-start justify-center pt-20'>
       <div
-        ref={searchRef}
+        ref={modalRef}
         className='bg-gray-800 rounded-lg shadow-xl w-full max-w-md mx-4 border border-gray-700 overflow-hidden'
       >
         <div className='bg-gray-900 p-6 flex flex-col items-center'>

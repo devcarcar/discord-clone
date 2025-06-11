@@ -3,14 +3,14 @@
 import { Search, X } from 'lucide-react';
 
 export default function SearchModal({
-  searchRef,
+  modalRef,
   inputRef,
   searchQuery,
   setSearchQuery,
   setIsModalOpen,
   searchResults,
 }: {
-  searchRef: any;
+  modalRef: any;
   inputRef: any;
   searchQuery: any;
   setSearchQuery: any;
@@ -20,7 +20,7 @@ export default function SearchModal({
   return (
     <div className='fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-start justify-center pt-20'>
       <div
-        ref={searchRef}
+        ref={modalRef}
         className='bg-gray-800 rounded-lg shadow-xl w-full max-w-md mx-4 border border-gray-700 p-4'
       >
         <div className='flex items-center border-b border-gray-700 pb-3'>

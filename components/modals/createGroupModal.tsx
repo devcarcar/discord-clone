@@ -1,7 +1,7 @@
 import { UploadDropzone } from '@/utils';
 
 export default function createGroupModal({
-  searchRef,
+  modalRef,
   pic,
   setPic,
   groupName,
@@ -9,7 +9,7 @@ export default function createGroupModal({
   handleCreateGroup,
   setgroupCreated,
 }: {
-  searchRef: any;
+  modalRef: any;
   pic: any;
   setPic: any;
   groupName: any;
@@ -20,7 +20,7 @@ export default function createGroupModal({
   return (
     <div className='fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-start justify-center pt-20'>
       <div
-        ref={searchRef}
+        ref={modalRef}
         className='bg-gray-800 rounded-lg shadow-xl w-full max-w-md mx-4 border border-gray-700 p-4'
       >
         <div className='flex flex-col p-6 items-center space-y-4 pb-3'>

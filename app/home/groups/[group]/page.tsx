@@ -1,6 +1,7 @@
 'use client';
 import Navbar from '@/components/Navbar';
 import Header from '@/components/header';
+import CreateModal from '@/components/modals/createModal';
 import MemberProfileModal from '@/components/modals/memberProfileModal';
 import SearchModal from '@/components/modals/searchModal';
 import { ModalType } from '@/helper';
@@ -15,6 +16,9 @@ export default function ExactGroup() {
   const group = params.group;
   const [groups, setGroups] = useState([]);
   const [searchResults, setSearchResults] = useState<any[]>([]);
+  const [groupName, setGroupName] = useState('');
+  const [mode, setMode] = useState(0);
+  const [pic, setPic] = useState();
   const [searchQuery, setSearchQuery] = useState('');
   const [isLoading, setisLoading] = useState(true);
   const [isModalOpen, setIsModalOpen] = useState<false | ModalType>(false);
@@ -29,7 +33,7 @@ export default function ExactGroup() {
     channels: any[];
   }
   const [groupObject, setGrpObj] = useState<any>({ channels: [] });
-  const searchRef = useRef<HTMLDivElement>(null);
+  const modalRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
 
   const [dms, setDms]: any[] = useState([]);
@@ -38,7 +42,7 @@ export default function ExactGroup() {
     async function fetchBoth() {
       try {
         const res = await axios.get('/api/users/me');
-        setMe(res.data);
+        setMe(res.data.data);
         setGroups(me.groups);
         setDms(me.dms);
         setSearchResults([...dms, ...groups]);
@@ -50,8 +54,8 @@ export default function ExactGroup() {
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
       if (
-        searchRef.current &&
-        !searchRef.current.contains(event.target as Node)
+        modalRef.current &&
+        !modalRef.current.contains(event.target as Node)
       ) {
         setIsModalOpen(false);
       }
@@ -93,7 +97,9 @@ export default function ExactGroup() {
   const categories = channels.filter((c) => c.type === ChannelType.CATEGORY);
 
   categories.map((cat) => (cat.channelList = []));
-
+  const onSuccess = (groupId: string) => {
+    router.push(`/home/groups/${groupId}`);
+  };
   channels.forEach((c: any) => {
     if (c.parent) {
       const found = categories.find((cat) => cat.channelId === c.parent);
@@ -134,6 +140,7 @@ export default function ExactGroup() {
                 {groupObject.name || 'Group Channels'}
               </h2>
               <button
+                className='hover:bg-gray-700 rounded-lg'
                 onClick={() => router.push(`/home/groups/${group}/settings`)}
               >
                 <Settings className='h-5 w-5 text-gray-500' />
@@ -227,17 +234,30 @@ export default function ExactGroup() {
       {isModalOpen === ModalType.SEARCH_MODAL && (
         <SearchModal
           inputRef={inputRef}
-          searchRef={searchRef}
+          modalRef={modalRef}
           searchQuery={searchQuery}
           setSearchQuery={setSearchQuery}
           setIsModalOpen={setIsModalOpen}
           searchResults={searchResults}
         />
       )}
+      {isModalOpen === ModalType.CREATE_MODAL &&
+        CreateModal({
+          me,
+          modalRef,
+          setIsModalOpen,
+          groupName,
+          setGroupName,
+          mode,
+          setMode,
+          pic,
+          setPic,
+          onSuccess,
+        })}
       {isModalOpen === ModalType.MEMBER_PROFILE_MODAL && (
         <MemberProfileModal
           me={me}
-          searchRef={searchRef}
+          modalRef={modalRef}
           member={selectedMember}
         />
       )}

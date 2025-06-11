@@ -27,3 +27,10 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ message: 'Error occured' }, { status: 401 });
   }
 }
+
+export async function GET() {
+  await connectDb();
+  const groups = await Group.find({});
+  const groupData = groups.map((group) => group.toObject());
+  return NextResponse.json(groupData, { status: 201 });
+}

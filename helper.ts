@@ -1,6 +1,7 @@
 export enum ModalType {
   SEARCH_MODAL = 1,
   CREATE_GROUP_MODAL = 999,
+  CREATE_MODAL = 989,
   MEMBER_PROFILE_MODAL = 10000000,
 }
 

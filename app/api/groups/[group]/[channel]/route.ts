@@ -2,9 +2,13 @@ import Group from '@/schemas/group';
 import connectDb from '@/lib/mongodb';
 import { NextRequest, NextResponse } from 'next/server';
 
-export async function POST(request: NextRequest) {
+export async function POST(
+  request: Request,
+  { params }: { params: { group: string; channel: string } }
+) {
+  const { group, channel } = await params;
   try {
-    const { group, channel, msgObj } = await request.json();
+    const { msgObj } = await request.json();
     await connectDb();
     const grp = await Group.findOne({ groupId: group });
     const newArr = grp.channels.map((c: any) => {

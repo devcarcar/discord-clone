@@ -1,10 +1,12 @@
 'use client';
 import Navbar from '@/components/Navbar';
 import Header from '@/components/header';
+import CreateModal from '@/components/modals/createModal';
 import SearchModal from '@/components/modals/searchModal';
 import { ModalType } from '@/helper';
 import axios from 'axios';
 import { Bell, Search, Sparkles, X } from 'lucide-react';
+import { useRouter } from 'next/navigation';
 import { useEffect, useRef, useState } from 'react';
 
 export default function Home() {
@@ -22,20 +24,30 @@ export default function Home() {
       time: '4h ago',
     },
   ];
+  const [groupName, setGroupName] = useState('');
+  const [mode, setMode] = useState<number>(0);
+  const [pic, setPic] = useState('');
+  const [me, setMe] = useState<any>();
   const [isSearching, setIsSearching] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
   const [isModalOpen, setIsModalOpen] = useState<false | ModalType>(false);
   const [searchResults, setSearchResults] = useState<any[]>([]);
-  const searchRef = useRef<HTMLDivElement>(null);
+  const modalRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
 
   const [dms, setDms]: any[] = useState([]);
   const [groups, setGroups]: any[] = useState([]);
 
+  const router = useRouter();
+  const onSuccess = (groupId: string) => {
+    router.push(`/home/groups/${groupId}`);
+  };
+
   useEffect(() => {
     async function fetchBoth() {
       try {
         const res = await axios.get('/api/users/me');
+        setMe(res.data.data);
         const { dms, groups } = res.data.data;
         setDms(dms);
         setGroups(groups);
@@ -47,8 +59,8 @@ export default function Home() {
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
       if (
-        searchRef.current &&
-        !searchRef.current.contains(event.target as Node)
+        modalRef.current &&
+        !modalRef.current.contains(event.target as Node)
       ) {
         setIsModalOpen(false);
       }
@@ -75,8 +87,8 @@ export default function Home() {
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
       if (
-        searchRef.current &&
-        !searchRef.current.contains(event.target as Node)
+        modalRef.current &&
+        !modalRef.current.contains(event.target as Node)
       ) {
         setIsSearching(false);
       }
@@ -152,12 +164,25 @@ export default function Home() {
         </div>
         {isModalOpen === ModalType.SEARCH_MODAL &&
           SearchModal({
-            searchRef,
+            modalRef,
             inputRef,
             searchQuery,
             setSearchQuery,
             setIsModalOpen,
             searchResults,
+          })}
+        {isModalOpen === ModalType.CREATE_MODAL &&
+          CreateModal({
+            me,
+            modalRef,
+            setIsModalOpen,
+            groupName,
+            setGroupName,
+            mode,
+            setMode,
+            pic,
+            setPic,
+            onSuccess,
           })}
       </div>
     </div>
